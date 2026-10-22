@@ -5,7 +5,7 @@
     и перевести значения (ключи name="…" не менять).
 -->
 <resources>
-    <string name="app_name">Сахалыы саҥарар кинигэлэр</string>
+    <string name="app_name">Саҥарар кинигэ</string>
     <string name="app_tagline">Якутская литература в исполнении актёров</string>
 
     <!-- Нижнее меню -->
