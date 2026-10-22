@@ -10,15 +10,15 @@
 
     <!-- Нижнее меню -->
     <string name="nav_catalog">Каталог</string>
-    <string name="nav_library">Мои книги</string>
+    <string name="nav_library">Мин кинигэлэрим</string>
     <string name="nav_profile">Профиль</string>
 
     <!-- Каталог -->
     <string name="catalog_title">Каталог</string>
     <string name="catalog_placeholder">Здесь появятся книги: обложки, авторы и описания.</string>
 
-    <!-- Мои книги -->
-    <string name="library_title">Мои книги</string>
+    <!-- Мин кинигэлэрим (мои книги) -->
+    <string name="library_title">Мин кинигэлэрим</string>
     <string name="library_empty">Вы ещё ничего не слушали. Выберите книгу в каталоге.</string>
 
     <!-- Профиль -->
