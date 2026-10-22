@@ -1,10 +1,18 @@
 # Автосборка: после каждого изменения GitHub сам собирает APK.
 # Скачать на телефон: страница репозитория → Releases → «Последняя сборка» → app-debug.apk
+# Если создать релиз вручную (Releases → Draft a new release), APK приложится к нему сам.
 name: Сборка APK
 
 on:
   push:
+    branches: ['**']
+  release:
+    types: [published]
   workflow_dispatch:
+    inputs:
+      release_tag:
+        description: 'Приложить APK к релизу с этим тегом (необязательно)'
+        required: false
 
 permissions:
   contents: write
@@ -25,8 +33,8 @@ jobs:
         with:
           name: app-debug
           path: app/build/outputs/apk/debug/*.apk
-      - name: Опубликовать в Releases
-        if: github.ref == 'refs/heads/main'
+      - name: Опубликовать в «Последняя сборка»
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         env:
           GH_TOKEN: ${{ github.token }}
           COMMIT_MSG: ${{ github.event.head_commit.message }}
@@ -35,4 +43,12 @@ jobs:
           gh release create latest app/build/outputs/apk/debug/app-debug.apk \
             --title "Последняя сборка" \
             --notes "Тестовая сборка из коммита ${GITHUB_SHA::7}: ${COMMIT_MSG%%$'\n'*}" \
-            --prerelease
+            --prerelease --latest=false
+      - name: Приложить APK к релизу, созданному вручную
+        if: github.event_name == 'release' || inputs.release_tag != ''
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ github.event.release.tag_name || inputs.release_tag }}
+        run: |
+          cp app/build/outputs/apk/debug/app-debug.apk "saharar-kinige-${TAG}.apk"
+          gh release upload "$TAG" "saharar-kinige-${TAG}.apk" --clobber
