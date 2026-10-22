@@ -1,10 +1,13 @@
 # Автосборка: после каждого изменения GitHub сам собирает APK.
-# Скачать: вкладка Actions → последний запуск → раздел Artifacts → app-debug.
+# Скачать на телефон: страница репозитория → Releases → «Последняя сборка» → app-debug.apk
 name: Сборка APK
 
 on:
   push:
   workflow_dispatch:
+
+permissions:
+  contents: write
 
 jobs:
   build:
@@ -22,3 +25,13 @@ jobs:
         with:
           name: app-debug
           path: app/build/outputs/apk/debug/*.apk
+      - name: Опубликовать в Releases
+        if: github.ref == 'refs/heads/main'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release delete latest --yes --cleanup-tag || true
+          gh release create latest app/build/outputs/apk/debug/app-debug.apk \
+            --title "Последняя сборка" \
+            --notes "Тестовая сборка из коммита ${GITHUB_SHA::7}: ${{ github.event.head_commit.message }}" \
+            --prerelease
