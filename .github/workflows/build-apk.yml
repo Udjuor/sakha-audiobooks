@@ -50,5 +50,9 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           TAG: ${{ github.event.release.tag_name || inputs.release_tag }}
         run: |
-          cp app/build/outputs/apk/debug/app-debug.apk "saharar-kinige-${TAG}.apk"
-          gh release upload "$TAG" "saharar-kinige-${TAG}.apk" --clobber
+          # Старые APK в этом релизе заменяем новым
+          for old in $(gh release view "$TAG" --json assets --jq '.assets[].name | select(endswith(".apk"))'); do
+            gh release delete-asset "$TAG" "$old" --yes
+          done
+          cp app/build/outputs/apk/debug/app-debug.apk "sanarar-kinige-${TAG}.apk"
+          gh release upload "$TAG" "sanarar-kinige-${TAG}.apk"
