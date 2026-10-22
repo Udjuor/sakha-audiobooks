@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Цвета, нужные системе до запуска Compose (заставка, иконка). Основная палитра — в ui/theme/Color.kt -->
+    <color name="warm_cream">#FFF8EE</color>
+    <color name="birch_brown">#5B3A24</color>
+    <color name="amber">#C8862E</color>
+    <color name="night_bg">#1E1712</color>
+</resources>

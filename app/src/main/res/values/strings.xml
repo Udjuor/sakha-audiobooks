@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    ВСЕ надписи интерфейса хранятся здесь.
+    Перевод на якутский язык: скопировать файл в res/values-sah/strings.xml
+    и перевести значения (ключи name="…" не менять).
+-->
+<resources>
+    <string name="app_name">Саха аудиокинигэ</string>
+    <string name="app_tagline">Якутская литература в исполнении актёров</string>
+
+    <!-- Нижнее меню -->
+    <string name="nav_catalog">Каталог</string>
+    <string name="nav_library">Мои книги</string>
+    <string name="nav_profile">Профиль</string>
+
+    <!-- Каталог -->
+    <string name="catalog_title">Каталог</string>
+    <string name="catalog_placeholder">Здесь появятся книги: обложки, авторы и описания.</string>
+
+    <!-- Мои книги -->
+    <string name="library_title">Мои книги</string>
+    <string name="library_empty">Вы ещё ничего не слушали. Выберите книгу в каталоге.</string>
+
+    <!-- Профиль -->
+    <string name="profile_title">Профиль</string>
+    <string name="profile_placeholder">Здесь будут вход, прогресс прослушивания и закладки.</string>
+</resources>

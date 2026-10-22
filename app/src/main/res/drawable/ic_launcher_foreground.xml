@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Временная иконка (книга + ромб в стиле орнамента). Заменим на работу художника. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp" android:height="108dp"
+    android:viewportWidth="108" android:viewportHeight="108">
+    <path android:fillColor="#C8862E"
+        android:pathData="M54,26 L62,34 L54,42 L46,34 Z" />
+    <path android:fillColor="#5B3A24"
+        android:pathData="M30,48 C38,44 47,45 52,50 L52,80 C47,75 38,74 30,78 Z" />
+    <path android:fillColor="#5B3A24"
+        android:pathData="M78,48 C70,44 61,45 56,50 L56,80 C61,75 70,74 78,78 Z" />
+</vector>

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="Theme.SakhaBooks" parent="android:Theme.Material.Light.NoActionBar">
+        <item name="android:windowBackground">@color/warm_cream</item>
+    </style>
+
+    <!-- Заставка при запуске -->
+    <style name="Theme.SakhaBooks.Splash" parent="Theme.SplashScreen">
+        <item name="windowSplashScreenBackground">@color/warm_cream</item>
+        <item name="windowSplashScreenAnimatedIcon">@drawable/ic_launcher_foreground</item>
+        <item name="postSplashScreenTheme">@style/Theme.SakhaBooks</item>
+    </style>
+</resources>
