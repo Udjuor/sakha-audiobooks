@@ -11,6 +11,7 @@
     <!-- Нижнее меню -->
     <string name="nav_catalog">Каталог</string>
     <string name="nav_library">Мин кинигэлэрим</string>
+    <string name="nav_speak">Сахалыы саҥар</string>
     <string name="nav_profile">Профиль</string>
 
     <!-- Каталог -->
@@ -35,6 +36,10 @@
     <!-- Мин кинигэлэрим (мои книги) -->
     <string name="library_title">Мин кинигэлэрим</string>
     <string name="library_empty">Вы ещё ничего не слушали. Выберите книгу в каталоге.</string>
+
+    <!-- Сахалыы саҥар -->
+    <string name="speak_title">Сахалыы саҥар</string>
+    <string name="speak_placeholder">Скоро здесь появится раздел для тех, кто хочет говорить по-якутски.</string>
 
     <!-- Профиль -->
     <string name="profile_title">Профиль</string>

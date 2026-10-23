@@ -21,6 +21,7 @@ import ru.sakhabooks.app.ui.book.BookScreen
 import ru.sakhabooks.app.ui.catalog.CatalogScreen
 import ru.sakhabooks.app.ui.library.LibraryScreen
 import ru.sakhabooks.app.ui.profile.ProfileScreen
+import ru.sakhabooks.app.ui.speak.SpeakScreen
 
 @Composable
 fun AppRoot() {
@@ -57,6 +58,7 @@ fun AppRoot() {
             composable<CatalogRoute> { CatalogScreen(onOpenBook = { navController.navigate(BookRoute(it)) }) }
             composable<BookRoute> { BookScreen(onBack = { navController.popBackStack() }) }
             composable<LibraryRoute> { LibraryScreen() }
+            composable<SpeakRoute> { SpeakScreen() }
             composable<ProfileRoute> { ProfileScreen() }
         }
     }
