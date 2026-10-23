@@ -29,9 +29,9 @@
     <string name="player_back_15">Назад на 15 секунд</string>
     <string name="player_forward_15">Вперёд на 15 секунд</string>
     <string name="player_speed">Скорость %1$s</string>
-    <string name="text_sah">Саха</string>
-    <string name="text_ru">Русский</string>
-    <string name="text_both">Оба</string>
+    <string name="text_sah">Текст на якутском</string>
+    <string name="text_ru">Русский перевод</string>
+    <string name="text_both">Якутский и русский вместе</string>
     <string name="notification_channel_name">Прослушивание книг</string>
     <string name="audio_coming_soon">🎧 Аудиозапись в исполнении актёра скоро появится.</string>
     <string name="translation_coming_soon">Русский перевод готовится. Пока доступен текст на якутском.</string>

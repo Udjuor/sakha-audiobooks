@@ -4,6 +4,7 @@ import android.Manifest
 import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Build
+import androidx.annotation.StringRes
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
@@ -25,9 +26,13 @@ import androidx.compose.material.icons.filled.FastForward
 import androidx.compose.material.icons.filled.FastRewind
 import androidx.compose.material.icons.filled.Pause
 import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material.icons.outlined.Article
+import androidx.compose.material.icons.outlined.Speed
+import androidx.compose.material.icons.outlined.Translate
+import androidx.compose.material.icons.outlined.ViewAgenda
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilledIconButton
-import androidx.compose.material3.FilterChip
+import androidx.compose.material3.FilledTonalIconToggleButton
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -44,6 +49,9 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -182,8 +190,15 @@ fun BookScreen(
                     }
                 }
                 Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
-                    TextButton(onClick = viewModel::cycleSpeed) {
-                        Text(stringResource(R.string.player_speed, formatSpeed(state.speed)))
+                    // Значок скорости и само число; полное название — для экранного диктора
+                    val speedLabel = stringResource(R.string.player_speed, formatSpeed(state.speed))
+                    TextButton(
+                        onClick = viewModel::cycleSpeed,
+                        modifier = Modifier.semantics { contentDescription = speedLabel },
+                    ) {
+                        Icon(Icons.Outlined.Speed, contentDescription = null)
+                        Spacer(Modifier.width(6.dp))
+                        Text(formatSpeed(state.speed))
                     }
                 }
             }
@@ -201,22 +216,17 @@ fun BookScreen(
                 Spacer(Modifier.height(12.dp))
                 Text(chapter.textSah, style = MaterialTheme.typography.bodyLarge)
             } else {
+                // Режим текста — значками: оригинал, перевод, оба
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    FilterChip(
-                        selected = textMode == TextMode.Sah,
-                        onClick = { textMode = TextMode.Sah },
-                        label = { Text(stringResource(R.string.text_sah)) },
-                    )
-                    FilterChip(
-                        selected = textMode == TextMode.Ru,
-                        onClick = { textMode = TextMode.Ru },
-                        label = { Text(stringResource(R.string.text_ru)) },
-                    )
-                    FilterChip(
-                        selected = textMode == TextMode.Both,
-                        onClick = { textMode = TextMode.Both },
-                        label = { Text(stringResource(R.string.text_both)) },
-                    )
+                    TextModeButton(textMode == TextMode.Sah, Icons.Outlined.Article, R.string.text_sah) {
+                        textMode = TextMode.Sah
+                    }
+                    TextModeButton(textMode == TextMode.Ru, Icons.Outlined.Translate, R.string.text_ru) {
+                        textMode = TextMode.Ru
+                    }
+                    TextModeButton(textMode == TextMode.Both, Icons.Outlined.ViewAgenda, R.string.text_both) {
+                        textMode = TextMode.Both
+                    }
                 }
                 Spacer(Modifier.height(12.dp))
                 if (textMode != TextMode.Ru) {
@@ -232,6 +242,13 @@ fun BookScreen(
                 }
             }
         }
+    }
+}
+
+@Composable
+private fun TextModeButton(selected: Boolean, icon: ImageVector, @StringRes label: Int, onClick: () -> Unit) {
+    FilledTonalIconToggleButton(checked = selected, onCheckedChange = { onClick() }) {
+        Icon(icon, contentDescription = stringResource(label))
     }
 }
 
