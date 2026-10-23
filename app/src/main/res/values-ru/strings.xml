@@ -12,6 +12,7 @@
     <string name="nav_catalog">Каталог</string>
     <string name="nav_library">Мин кинигэлэрим</string>
     <string name="nav_speak">Сахалыы саҥар</string>
+    <string name="nav_player">Плеер</string>
     <string name="nav_profile">Профиль</string>
 
     <!-- Каталог -->
@@ -23,6 +24,9 @@
     <!-- Книга и плеер -->
     <string name="back">Назад</string>
     <string name="book_not_found">Книга не найдена.</string>
+    <string name="player_title">Плеер</string>
+    <string name="player_empty">Сейчас ничего не играет. Выберите сказку с озвучкой:</string>
+    <string name="player_read_text">Читать текст</string>
     <string name="player_play">Слушать</string>
     <string name="player_pause">Пауза</string>
     <string name="player_back_15">Назад на 15 секунд</string>

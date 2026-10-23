@@ -21,14 +21,12 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emptyFlow
-import kotlinx.coroutines.flow.filterNotNull
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.withTimeoutOrNull
 import ru.sakhabooks.app.ui.book.BookScreen
 import ru.sakhabooks.app.ui.catalog.CatalogScreen
 import ru.sakhabooks.app.ui.library.LibraryScreen
 import ru.sakhabooks.app.ui.player.MiniPlayer
 import ru.sakhabooks.app.ui.player.MiniPlayerViewModel
+import ru.sakhabooks.app.ui.player.PlayerScreen
 import ru.sakhabooks.app.ui.profile.ProfileScreen
 import ru.sakhabooks.app.ui.speak.SpeakScreen
 
@@ -43,34 +41,33 @@ fun AppRoot(
     val openBook: (String) -> Unit = { bookId ->
         navController.navigate(BookRoute(bookId)) { launchSingleTop = true }
     }
-
-    // Нажали на уведомление плеера — открываем экран играющей книги
-    LaunchedEffect(openNowPlayingRequests) {
-        openNowPlayingRequests.collect {
-            val playing = withTimeoutOrNull(3_000) { miniPlayerViewModel.state.filterNotNull().first() }
-            if (playing != null) openBook(playing.book.id)
+    val openTab: (TopLevelTab) -> Unit = { tab ->
+        navController.navigate(tab.route) {
+            popUpTo(navController.graph.findStartDestination().id) { saveState = true }
+            launchSingleTop = true
+            restoreState = true
         }
+    }
+    val openPlayer = { openTab(TopLevelTab.Player) }
+
+    // Нажали на уведомление плеера — открываем вкладку «Плеер»
+    LaunchedEffect(openNowPlayingRequests) {
+        openNowPlayingRequests.collect { openPlayer() }
     }
 
     Scaffold(
         bottomBar = {
             Column {
-                // На экране книги свой большой плеер — мини-плеер там не нужен
-                if (currentDestination?.hasRoute(BookRoute::class) != true) {
-                    MiniPlayer(onOpenBook = openBook, viewModel = miniPlayerViewModel)
+                // Во вкладке «Плеер» мини-плеер не нужен — там большой
+                if (currentDestination?.hasRoute(PlayerRoute::class) != true) {
+                    MiniPlayer(onOpenPlayer = openPlayer, viewModel = miniPlayerViewModel)
                 }
                 NavigationBar {
                     TopLevelTab.entries.forEach { tab ->
                         val selected = currentDestination?.hierarchy?.any { it.hasRoute(tab.route::class) } == true
                         NavigationBarItem(
                             selected = selected,
-                            onClick = {
-                                navController.navigate(tab.route) {
-                                    popUpTo(navController.graph.findStartDestination().id) { saveState = true }
-                                    launchSingleTop = true
-                                    restoreState = true
-                                }
-                            },
+                            onClick = { openTab(tab) },
                             // Только значок; название вкладки — для экранного диктора
                             icon = { Icon(tab.icon, contentDescription = stringResource(tab.label)) },
                         )
@@ -85,7 +82,8 @@ fun AppRoot(
             modifier = Modifier.padding(padding),
         ) {
             composable<CatalogRoute> { CatalogScreen(onOpenBook = openBook) }
-            composable<BookRoute> { BookScreen(onBack = { navController.popBackStack() }) }
+            composable<BookRoute> { BookScreen(onBack = { navController.popBackStack() }, onOpenPlayer = openPlayer) }
+            composable<PlayerRoute> { PlayerScreen(onOpenBook = openBook) }
             composable<LibraryRoute> { LibraryScreen(onOpenBook = openBook) }
             composable<SpeakRoute> { SpeakScreen() }
             composable<ProfileRoute> { ProfileScreen() }

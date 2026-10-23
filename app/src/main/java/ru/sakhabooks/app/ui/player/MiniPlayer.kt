@@ -31,6 +31,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
@@ -42,7 +43,6 @@ import ru.sakhabooks.app.data.pick
 import ru.sakhabooks.app.player.NowPlaying
 import ru.sakhabooks.app.player.PlayerConnection
 import ru.sakhabooks.app.ui.catalog.BookCover
-import javax.inject.Inject
 
 data class MiniPlayerState(
     val book: Book,
@@ -86,17 +86,17 @@ class MiniPlayerViewModel @Inject constructor(
     }
 }
 
-/** Полоска «сейчас играет» над нижним меню: обложка, название, пауза/играть. */
+/** Полоска «сейчас играет» над нижним меню: обложка, название, пауза/играть. Нажатие — вкладка «Плеер». */
 @Composable
 fun MiniPlayer(
-    onOpenBook: (String) -> Unit,
+    onOpenPlayer: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: MiniPlayerViewModel = hiltViewModel(),
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val s = state ?: return
     Surface(
-        modifier = modifier.fillMaxWidth().clickable { onOpenBook(s.book.id) },
+        modifier = modifier.fillMaxWidth().clickable(onClick = onOpenPlayer),
         color = MaterialTheme.colorScheme.surfaceContainer,
         tonalElevation = 3.dp,
     ) {

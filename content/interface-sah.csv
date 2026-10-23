@@ -4,6 +4,7 @@ app_tagline,Yakut literature performed by actors,Якутская литерат
 nav_catalog,Catalog,Каталог,
 nav_library,Мин кинигэлэрим (My books),Мин кинигэлэрим,Мин кинигэлэрим
 nav_speak,Сахалыы саҥар (Speak Yakut),Сахалыы саҥар,Сахалыы саҥар
+nav_player,Player,Плеер,
 nav_profile,Profile,Профиль,
 catalog_title,Catalog,Каталог,
 catalog_placeholder,"Books will appear here: covers, authors and descriptions.","Здесь появятся книги: обложки, авторы и описания.",
@@ -11,6 +12,9 @@ badge_demo,Demo,Демо,
 badge_free,Free,Бесплатно,
 back,Back,Назад,
 book_not_found,Book not found.,Книга не найдена.,
+player_title,Player,Плеер,
+player_empty,Nothing is playing yet. Pick a tale with a recording:,Сейчас ничего не играет. Выберите сказку с озвучкой:,
+player_read_text,Read the text,Читать текст,
 player_play,Listen,Слушать,
 player_pause,Pause,Пауза,
 player_back_15,Back 15 seconds,Назад на 15 секунд,

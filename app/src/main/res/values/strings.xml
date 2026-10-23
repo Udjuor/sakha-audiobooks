@@ -12,6 +12,7 @@
     <string name="nav_catalog">Catalog</string>
     <string name="nav_library">Мин кинигэлэрим (My books)</string>
     <string name="nav_speak">Сахалыы саҥар (Speak Yakut)</string>
+    <string name="nav_player">Player</string>
     <string name="nav_profile">Profile</string>
 
     <!-- Catalog -->
@@ -23,6 +24,9 @@
     <!-- Book and player -->
     <string name="back">Back</string>
     <string name="book_not_found">Book not found.</string>
+    <string name="player_title">Player</string>
+    <string name="player_empty">Nothing is playing yet. Pick a tale with a recording:</string>
+    <string name="player_read_text">Read the text</string>
     <string name="player_play">Listen</string>
     <string name="player_pause">Pause</string>
     <string name="player_back_15">Back 15 seconds</string>
