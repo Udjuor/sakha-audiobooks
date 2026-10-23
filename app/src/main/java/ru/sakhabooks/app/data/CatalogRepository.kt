@@ -27,8 +27,11 @@ class CatalogRepository @Inject constructor(
 
     fun book(id: String): Book? = catalog.books.firstOrNull { it.id == id }
 
-    /** Адрес аудио для плеера: встроенный файл из assets. */
-    fun audioUri(chapter: Chapter): String = "asset:///$DEMO_DIR/${chapter.audio}"
+    /** Адрес аудио для плеера: встроенный файл из assets. null — аудио ещё нет. */
+    fun audioUri(chapter: Chapter): String? = chapter.audio?.let { "asset:///$DEMO_DIR/$it" }
+
+    /** Путь к обложке внутри assets. null — обложки нет, покажем временную. */
+    fun coverPath(book: Book): String? = book.cover?.let { "$DEMO_DIR/$it" }
 
     private companion object {
         const val DEMO_DIR = "demo"

@@ -21,6 +21,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.BiasAlignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
@@ -32,15 +33,18 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import ru.sakhabooks.app.R
 import ru.sakhabooks.app.data.Book
 import ru.sakhabooks.app.data.CatalogRepository
+import ru.sakhabooks.app.ui.components.AssetImage
 import ru.sakhabooks.app.ui.components.OrnamentBand
 import ru.sakhabooks.app.ui.components.TabScreen
 import javax.inject.Inject
 
 @HiltViewModel
 class CatalogViewModel @Inject constructor(
-    repository: CatalogRepository,
+    private val repository: CatalogRepository,
 ) : ViewModel() {
     val books: List<Book> = repository.books()
+
+    fun coverPath(book: Book): String? = repository.coverPath(book)
 }
 
 @Composable
@@ -56,7 +60,7 @@ fun CatalogScreen(
         } else {
             LazyColumn(verticalArrangement = Arrangement.spacedBy(12.dp)) {
                 items(viewModel.books, key = { it.id }) { book ->
-                    BookCard(book = book, onClick = { onOpenBook(book.id) })
+                    BookCard(book = book, coverPath = viewModel.coverPath(book), onClick = { onOpenBook(book.id) })
                 }
             }
         }
@@ -64,13 +68,13 @@ fun CatalogScreen(
 }
 
 @Composable
-private fun BookCard(book: Book, onClick: () -> Unit) {
+private fun BookCard(book: Book, coverPath: String?, onClick: () -> Unit) {
     Card(
         modifier = Modifier.fillMaxWidth().clickable(onClick = onClick),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainer),
     ) {
         Row(Modifier.padding(12.dp), verticalAlignment = Alignment.CenterVertically) {
-            BookCover(book)
+            BookCover(book, coverPath)
             Spacer(Modifier.width(16.dp))
             Column(Modifier.weight(1f)) {
                 Text(book.titleSah, style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.SemiBold)
@@ -89,14 +93,30 @@ private fun BookCard(book: Book, onClick: () -> Unit) {
     }
 }
 
-/** Временная обложка, пока нет настоящих иллюстраций: первая буква и полоса орнамента. */
+/** Обложка книги. Если иллюстрации нет — временная: первая буква и полоса орнамента. */
 @Composable
-fun BookCover(book: Book, modifier: Modifier = Modifier, sizeDp: Int = 88) {
+fun BookCover(book: Book, coverPath: String?, modifier: Modifier = Modifier, sizeDp: Int = 88) {
+    val shape = Modifier
+        .size(width = sizeDp.dp, height = (sizeDp * 1.3f).dp)
+        .clip(RoundedCornerShape(8.dp))
+    if (coverPath == null) {
+        LetterCover(book, modifier.then(shape))
+    } else {
+        AssetImage(
+            path = coverPath,
+            contentDescription = book.titleSah,
+            modifier = modifier.then(shape),
+            // Иллюстрации горизонтальные — в узкой карточке сдвигаем кадр чуть вправо, к героям
+            alignment = BiasAlignment(0.3f, 0f),
+            placeholder = { LetterCover(book, modifier.then(shape)) },
+        )
+    }
+}
+
+@Composable
+private fun LetterCover(book: Book, modifier: Modifier) {
     Box(
-        modifier
-            .size(width = sizeDp.dp, height = (sizeDp * 1.3f).dp)
-            .clip(RoundedCornerShape(8.dp))
-            .background(MaterialTheme.colorScheme.primary),
+        modifier.background(MaterialTheme.colorScheme.primary),
         contentAlignment = Alignment.Center,
     ) {
         Text(

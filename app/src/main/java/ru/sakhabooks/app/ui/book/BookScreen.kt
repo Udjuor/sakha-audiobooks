@@ -1,6 +1,7 @@
 package ru.sakhabooks.app.ui.book
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -11,6 +12,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -36,6 +38,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -43,6 +46,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import ru.sakhabooks.app.R
 import ru.sakhabooks.app.ui.catalog.BookCover
+import ru.sakhabooks.app.ui.components.AssetImage
 import ru.sakhabooks.app.ui.components.OrnamentBand
 import java.util.Locale
 
@@ -78,92 +82,133 @@ fun BookScreen(
                 .verticalScroll(rememberScrollState())
                 .padding(16.dp),
         ) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                BookCover(book, sizeDp = 72)
-                Spacer(Modifier.width(16.dp))
-                Column {
-                    Text(book.titleSah, style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.SemiBold)
-                    Text(book.author, style = MaterialTheme.typography.bodyMedium)
-                    Text(chapter.title, style = MaterialTheme.typography.bodySmall)
+            val coverPath = viewModel.coverPath
+            if (coverPath != null) {
+                // Иллюстрация во всю ширину
+                AssetImage(
+                    path = coverPath,
+                    contentDescription = book.titleSah,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .aspectRatio(COVER_ASPECT)
+                        .clip(RoundedCornerShape(12.dp)),
+                )
+                Spacer(Modifier.height(12.dp))
+                Text(book.titleSah, style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.SemiBold)
+                Text(book.titleRu, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                Text(book.author, style = MaterialTheme.typography.bodyMedium)
+            } else {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    BookCover(book, coverPath = null, sizeDp = 72)
+                    Spacer(Modifier.width(16.dp))
+                    Column {
+                        Text(book.titleSah, style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.SemiBold)
+                        Text(book.author, style = MaterialTheme.typography.bodyMedium)
+                        Text(chapter.title, style = MaterialTheme.typography.bodySmall)
+                    }
                 }
+            }
+            if (book.descriptionRu.isNotBlank()) {
+                Spacer(Modifier.height(8.dp))
+                Text(book.descriptionRu, style = MaterialTheme.typography.bodyMedium)
             }
 
             Spacer(Modifier.height(16.dp))
 
             // Плеер
-            Slider(
-                value = state.positionMs.toFloat(),
-                onValueChange = { viewModel.seekTo(it.toLong()) },
-                valueRange = 0f..state.durationMs.coerceAtLeast(1L).toFloat(),
-            )
-            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                Text(formatTime(state.positionMs), style = MaterialTheme.typography.labelMedium)
-                Text(formatTime(state.durationMs), style = MaterialTheme.typography.labelMedium)
-            }
-            Row(
-                Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.Center,
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                IconButton(onClick = { viewModel.seekBy(-SEEK_MS) }) {
-                    Icon(Icons.Filled.FastRewind, contentDescription = stringResource(R.string.player_back_15))
+            if (!viewModel.hasAudio) {
+                Text(
+                    stringResource(R.string.audio_coming_soon),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            } else {
+                Slider(
+                    value = state.positionMs.toFloat(),
+                    onValueChange = { viewModel.seekTo(it.toLong()) },
+                    valueRange = 0f..state.durationMs.coerceAtLeast(1L).toFloat(),
+                )
+                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                    Text(formatTime(state.positionMs), style = MaterialTheme.typography.labelMedium)
+                    Text(formatTime(state.durationMs), style = MaterialTheme.typography.labelMedium)
                 }
-                Spacer(Modifier.width(16.dp))
-                FilledIconButton(onClick = viewModel::togglePlay, modifier = Modifier.size(64.dp)) {
-                    Icon(
-                        if (state.isPlaying) Icons.Filled.Pause else Icons.Filled.PlayArrow,
-                        contentDescription = stringResource(if (state.isPlaying) R.string.player_pause else R.string.player_play),
-                        modifier = Modifier.size(36.dp),
-                    )
+                Row(
+                    Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.Center,
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    IconButton(onClick = { viewModel.seekBy(-SEEK_MS) }) {
+                        Icon(Icons.Filled.FastRewind, contentDescription = stringResource(R.string.player_back_15))
+                    }
+                    Spacer(Modifier.width(16.dp))
+                    FilledIconButton(onClick = viewModel::togglePlay, modifier = Modifier.size(64.dp)) {
+                        Icon(
+                            if (state.isPlaying) Icons.Filled.Pause else Icons.Filled.PlayArrow,
+                            contentDescription = stringResource(if (state.isPlaying) R.string.player_pause else R.string.player_play),
+                            modifier = Modifier.size(36.dp),
+                        )
+                    }
+                    Spacer(Modifier.width(16.dp))
+                    IconButton(onClick = { viewModel.seekBy(SEEK_MS) }) {
+                        Icon(Icons.Filled.FastForward, contentDescription = stringResource(R.string.player_forward_15))
+                    }
                 }
-                Spacer(Modifier.width(16.dp))
-                IconButton(onClick = { viewModel.seekBy(SEEK_MS) }) {
-                    Icon(Icons.Filled.FastForward, contentDescription = stringResource(R.string.player_forward_15))
-                }
-            }
-            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
-                TextButton(onClick = viewModel::cycleSpeed) {
-                    Text(stringResource(R.string.player_speed, formatSpeed(state.speed)))
+                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
+                    TextButton(onClick = viewModel::cycleSpeed) {
+                        Text(stringResource(R.string.player_speed, formatSpeed(state.speed)))
+                    }
                 }
             }
 
             HorizontalDivider(Modifier.padding(vertical = 12.dp))
 
             // Текст произведения
-            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                FilterChip(
-                    selected = textMode == TextMode.Sah,
-                    onClick = { textMode = TextMode.Sah },
-                    label = { Text(stringResource(R.string.text_sah)) },
-                )
-                FilterChip(
-                    selected = textMode == TextMode.Ru,
-                    onClick = { textMode = TextMode.Ru },
-                    label = { Text(stringResource(R.string.text_ru)) },
-                )
-                FilterChip(
-                    selected = textMode == TextMode.Both,
-                    onClick = { textMode = TextMode.Both },
-                    label = { Text(stringResource(R.string.text_both)) },
-                )
-            }
-            Spacer(Modifier.height(12.dp))
-            if (textMode != TextMode.Ru) {
-                Text(chapter.textSah, style = MaterialTheme.typography.bodyLarge)
-            }
-            if (textMode == TextMode.Both) Spacer(Modifier.height(16.dp))
-            if (textMode != TextMode.Sah) {
+            val hasTranslation = chapter.textRu.isNotBlank()
+            if (!hasTranslation) {
                 Text(
-                    chapter.textRu,
-                    style = MaterialTheme.typography.bodyLarge,
-                    color = if (textMode == TextMode.Both) MaterialTheme.colorScheme.onSurfaceVariant else MaterialTheme.colorScheme.onSurface,
+                    stringResource(R.string.translation_coming_soon),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
+                Spacer(Modifier.height(12.dp))
+                Text(chapter.textSah, style = MaterialTheme.typography.bodyLarge)
+            } else {
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    FilterChip(
+                        selected = textMode == TextMode.Sah,
+                        onClick = { textMode = TextMode.Sah },
+                        label = { Text(stringResource(R.string.text_sah)) },
+                    )
+                    FilterChip(
+                        selected = textMode == TextMode.Ru,
+                        onClick = { textMode = TextMode.Ru },
+                        label = { Text(stringResource(R.string.text_ru)) },
+                    )
+                    FilterChip(
+                        selected = textMode == TextMode.Both,
+                        onClick = { textMode = TextMode.Both },
+                        label = { Text(stringResource(R.string.text_both)) },
+                    )
+                }
+                Spacer(Modifier.height(12.dp))
+                if (textMode != TextMode.Ru) {
+                    Text(chapter.textSah, style = MaterialTheme.typography.bodyLarge)
+                }
+                if (textMode == TextMode.Both) Spacer(Modifier.height(16.dp))
+                if (textMode != TextMode.Sah) {
+                    Text(
+                        chapter.textRu,
+                        style = MaterialTheme.typography.bodyLarge,
+                        color = if (textMode == TextMode.Both) MaterialTheme.colorScheme.onSurfaceVariant else MaterialTheme.colorScheme.onSurface,
+                    )
+                }
             }
         }
     }
 }
 
 private const val SEEK_MS = 15_000L
+private const val COVER_ASPECT = 1.4f
 
 private fun formatTime(ms: Long): String {
     val total = ms / 1000

@@ -15,8 +15,8 @@ android {
         applicationId = "ru.sakhabooks.app"
         minSdk = 26
         targetSdk = 36
-        versionCode = 3
-        versionName = "0.1.1-demo"
+        versionCode = 4
+        versionName = "0.2"
     }
 
     // Постоянный ключ для ТЕСТОВЫХ сборок: без него GitHub подписывал каждую сборку

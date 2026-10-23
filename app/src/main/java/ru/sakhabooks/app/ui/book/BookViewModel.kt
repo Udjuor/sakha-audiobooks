@@ -41,6 +41,9 @@ class BookViewModel @Inject constructor(
 
     val book: Book? = repository.book(savedStateHandle.toRoute<BookRoute>().bookId)
     val chapter: Chapter? = book?.chapters?.firstOrNull()
+    val coverPath: String? = book?.let(repository::coverPath)
+    private val audioUri: String? = chapter?.let(repository::audioUri)
+    val hasAudio: Boolean = audioUri != null
 
     private val _state = MutableStateFlow(PlayerUiState())
     val state: StateFlow<PlayerUiState> = _state.asStateFlow()
@@ -48,10 +51,10 @@ class BookViewModel @Inject constructor(
     private val player: ExoPlayer = ExoPlayer.Builder(context).build()
 
     init {
-        chapter?.let { ch ->
-            player.setMediaItem(MediaItem.fromUri(repository.audioUri(ch)))
+        if (chapter != null && audioUri != null) {
+            player.setMediaItem(MediaItem.fromUri(audioUri))
             player.prepare()
-            val saved = progress.position(ch.id)
+            val saved = progress.position(chapter.id)
             if (saved > 0) player.seekTo(saved)
         }
         player.addListener(object : Player.Listener {
@@ -109,6 +112,7 @@ class BookViewModel @Inject constructor(
 
     private fun savePosition() {
         val ch = chapter ?: return
+        if (!hasAudio) return
         if (player.playbackState != Player.STATE_ENDED) progress.save(ch.id, player.currentPosition)
     }
 

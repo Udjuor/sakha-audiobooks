@@ -28,8 +28,8 @@ data class Chapter(
     val id: String,
     val number: Int,
     val title: String,
-    /** Имя аудиофайла внутри папки demo/ (позже — ссылка на сервер). */
-    val audio: String,
+    /** Имя аудиофайла внутри папки demo/ (позже — ссылка на сервер). null — аудио ещё не записано. */
+    val audio: String? = null,
     @SerialName("duration_sec") val durationSec: Int = 0,
     @SerialName("text_sah") val textSah: String = "",
     @SerialName("text_ru") val textRu: String = "",

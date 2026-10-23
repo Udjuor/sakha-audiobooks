@@ -32,6 +32,8 @@
     <string name="text_sah">Саха</string>
     <string name="text_ru">Русский</string>
     <string name="text_both">Оба</string>
+    <string name="audio_coming_soon">🎧 Аудиозапись в исполнении актёра скоро появится.</string>
+    <string name="translation_coming_soon">Русский перевод готовится. Пока доступен текст на якутском.</string>
 
     <!-- Мин кинигэлэрим (мои книги) -->
     <string name="library_title">Мин кинигэлэрим</string>
