@@ -7,7 +7,6 @@ import android.os.Build
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -118,8 +117,9 @@ fun BookScreen(
                     contentDescription = book.titleSah,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .aspectRatio(COVER_ASPECT)
                         .clip(RoundedCornerShape(12.dp)),
+                    // Горизонтальная иллюстрация — целиком; вертикальная — квадратом, чтобы плеер не уехал вниз
+                    aspectRatioFor = { it.coerceAtLeast(1f) },
                 )
                 Spacer(Modifier.height(12.dp))
                 Text(book.titleSah, style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.SemiBold)
@@ -240,7 +240,6 @@ private const val SEEK_MS = 15_000L
 private fun notificationsGranted(context: Context): Boolean =
     Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU ||
         ContextCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED
-private const val COVER_ASPECT = 1.4f
 
 private fun formatTime(ms: Long): String {
     val total = ms / 1000

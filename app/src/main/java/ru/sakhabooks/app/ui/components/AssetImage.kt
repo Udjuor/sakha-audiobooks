@@ -2,6 +2,7 @@ package ru.sakhabooks.app.ui.components
 
 import android.graphics.BitmapFactory
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.produceState
@@ -25,6 +26,8 @@ fun AssetImage(
     modifier: Modifier = Modifier,
     contentScale: ContentScale = ContentScale.Crop,
     alignment: Alignment = Alignment.Center,
+    /** Пропорции рамки в зависимости от пропорций картинки (ширина / высота). null — рамку задаёт [modifier]. */
+    aspectRatioFor: ((imageAspect: Float) -> Float)? = null,
     placeholder: @Composable () -> Unit = {},
 ) {
     val context = LocalContext.current
@@ -41,7 +44,12 @@ fun AssetImage(
     if (image == null) {
         placeholder()
     } else {
-        Image(image, contentDescription, modifier, alignment = alignment, contentScale = contentScale)
+        val sized = if (aspectRatioFor == null) {
+            modifier
+        } else {
+            modifier.aspectRatio(aspectRatioFor(image.width.toFloat() / image.height))
+        }
+        Image(image, contentDescription, sized, alignment = alignment, contentScale = contentScale)
     }
 }
 
