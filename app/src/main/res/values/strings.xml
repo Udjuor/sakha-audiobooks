@@ -1,67 +1,64 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-    ВСЕ надписи интерфейса хранятся здесь.
-    Перевод на якутский язык: скопировать файл в res/values-sah/strings.xml
-    и перевести значения (ключи name="…" не менять).
+    Interface strings in English — the default language (used when the phone's language
+    has no translation of its own). Russian: res/values-ru/strings.xml.
+    Yakut: res/values-sah/strings.xml (see docs/translations.md). Do not change name="…" keys.
 -->
 <resources>
     <string name="app_name">Саҥарар кинигэ</string>
-    <string name="app_tagline">Якутская литература в исполнении актёров</string>
+    <string name="app_tagline">Yakut literature performed by actors</string>
 
-    <!-- Нижнее меню -->
-    <string name="nav_catalog">Каталог</string>
-    <string name="nav_library">Мин кинигэлэрим</string>
-    <string name="nav_speak">Сахалыы саҥар</string>
-    <string name="nav_profile">Профиль</string>
+    <!-- Bottom navigation (labels are hidden — read aloud by the screen reader) -->
+    <string name="nav_catalog">Catalog</string>
+    <string name="nav_library">Мин кинигэлэрим (My books)</string>
+    <string name="nav_speak">Сахалыы саҥар (Speak Yakut)</string>
+    <string name="nav_profile">Profile</string>
 
-    <!-- Каталог -->
-    <string name="catalog_title">Каталог</string>
-    <string name="catalog_placeholder">Здесь появятся книги: обложки, авторы и описания.</string>
+    <!-- Catalog -->
+    <string name="catalog_title">Catalog</string>
+    <string name="catalog_placeholder">Books will appear here: covers, authors and descriptions.</string>
+    <string name="badge_demo">Demo</string>
+    <string name="badge_free">Free</string>
 
-    <string name="badge_demo">Демо</string>
-    <string name="badge_free">Бесплатно</string>
+    <!-- Book and player -->
+    <string name="back">Back</string>
+    <string name="book_not_found">Book not found.</string>
+    <string name="player_play">Listen</string>
+    <string name="player_pause">Pause</string>
+    <string name="player_back_15">Back 15 seconds</string>
+    <string name="player_forward_15">Forward 15 seconds</string>
+    <string name="player_speed">Speed %1$s</string>
+    <string name="text_sah">Yakut text</string>
+    <string name="text_translation">Translation</string>
+    <string name="text_both">Yakut text and translation together</string>
+    <string name="notification_channel_name">Listening to books</string>
+    <string name="audio_coming_soon">🎧 A recording performed by an actor is coming soon.</string>
+    <string name="translation_coming_soon">The English translation is in progress. The Yakut text is available now.</string>
 
-    <!-- Книга и плеер -->
-    <string name="back">Назад</string>
-    <string name="book_not_found">Книга не найдена.</string>
-    <string name="player_play">Слушать</string>
-    <string name="player_pause">Пауза</string>
-    <string name="player_back_15">Назад на 15 секунд</string>
-    <string name="player_forward_15">Вперёд на 15 секунд</string>
-    <string name="player_speed">Скорость %1$s</string>
-    <string name="text_sah">Текст на якутском</string>
-    <string name="text_ru">Русский перевод</string>
-    <string name="text_both">Якутский и русский вместе</string>
-    <string name="notification_channel_name">Прослушивание книг</string>
-    <string name="audio_coming_soon">🎧 Аудиозапись в исполнении актёра скоро появится.</string>
-    <string name="translation_coming_soon">Русский перевод готовится. Пока доступен текст на якутском.</string>
-
-    <!-- Мин кинигэлэрим (мои книги) -->
+    <!-- Мин кинигэлэрим (my books) -->
     <string name="library_title">Мин кинигэлэрим</string>
-    <string name="library_listening">Слушаю</string>
-    <string name="library_favorites">Избранное</string>
-    <string name="library_listening_empty">Здесь появятся книги, которые вы начали слушать.</string>
-    <string name="library_favorites_empty">Отметьте книгу сердечком — она появится здесь.</string>
-    <string name="library_continue">Продолжить</string>
-    <string name="library_finished">Прослушано</string>
-    <string name="favorite_add">Добавить в избранное</string>
-    <string name="favorite_remove">Убрать из избранного</string>
+    <string name="library_listening">Listening</string>
+    <string name="library_favorites">Favorites</string>
+    <string name="library_listening_empty">Books you start listening to will appear here.</string>
+    <string name="library_favorites_empty">Tap the heart on a book and it will appear here.</string>
+    <string name="library_continue">Continue</string>
+    <string name="library_finished">Finished</string>
+    <string name="favorite_add">Add to favorites</string>
+    <string name="favorite_remove">Remove from favorites</string>
 
-    <!-- Сахалыы саҥар -->
+    <!-- Сахалыы саҥар (speak Yakut) -->
     <string name="speak_title">Сахалыы саҥар</string>
-    <string name="speak_placeholder">Скоро здесь появится раздел для тех, кто хочет говорить по-якутски.</string>
-    <string name="speak_intro">Первые шаги в якутском языке: особые буквы, простые фразы и слова из сказок.</string>
-    <string name="speak_demo_note">Демо-материал: проверяется носителем языка, озвучка актёром появится позже.</string>
-    <string name="expand">Развернуть</string>
-    <string name="collapse">Свернуть</string>
+    <string name="speak_placeholder">Lessons are coming soon.</string>
+    <string name="speak_intro">Learn Yakut: sounds, words and phrases.</string>
+    <string name="speak_demo_note">Demo material: being checked by a native speaker; audio will be added later.</string>
+    <string name="expand">Expand</string>
+    <string name="collapse">Collapse</string>
     <plurals name="speak_cards_count">
-        <item quantity="one">%d карточка</item>
-        <item quantity="few">%d карточки</item>
-        <item quantity="many">%d карточек</item>
-        <item quantity="other">%d карточки</item>
+        <item quantity="one">%d card</item>
+        <item quantity="other">%d cards</item>
     </plurals>
 
-    <!-- Профиль -->
-    <string name="profile_title">Профиль</string>
-    <string name="profile_placeholder">Здесь будут вход, прогресс прослушивания и закладки.</string>
+    <!-- Profile -->
+    <string name="profile_title">Profile</string>
+    <string name="profile_placeholder">Sign-in, listening progress and bookmarks will be here.</string>
 </resources>

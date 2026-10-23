@@ -38,6 +38,7 @@ import kotlinx.coroutines.flow.stateIn
 import ru.sakhabooks.app.R
 import ru.sakhabooks.app.data.Book
 import ru.sakhabooks.app.data.CatalogRepository
+import ru.sakhabooks.app.data.pick
 import ru.sakhabooks.app.player.NowPlaying
 import ru.sakhabooks.app.player.PlayerConnection
 import ru.sakhabooks.app.ui.catalog.BookCover
@@ -119,7 +120,7 @@ fun MiniPlayer(
                         overflow = TextOverflow.Ellipsis,
                     )
                     Text(
-                        s.book.author,
+                        s.book.author.pick(),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         maxLines = 1,

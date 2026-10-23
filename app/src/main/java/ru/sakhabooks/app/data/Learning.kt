@@ -8,10 +8,14 @@ import kotlinx.serialization.json.Json
 import javax.inject.Inject
 import javax.inject.Singleton
 
-/** Учебные материалы раздела «Сахалыы саҥар». Позже тот же формат будет отдавать сервер. */
+/**
+ * Учебные материалы раздела «Сахалыы саҥар» — загружаемый контент: приложение ничего не знает
+ * о конкретных уроках, а показывает то, что пришло в файле. Сейчас файл встроен в приложение,
+ * позже тот же формат будет отдавать сервер. Описание формата — docs/learning-content.md.
+ */
 @Serializable
 data class LearningFile(
-    val version: Int = 1,
+    val version: Int = 2,
     @SerialName("is_demo") val isDemo: Boolean = false,
     val sections: List<LearningSection> = emptyList(),
 )
@@ -19,17 +23,18 @@ data class LearningFile(
 @Serializable
 data class LearningSection(
     val id: String,
-    val title: String,
-    val subtitle: String = "",
+    val title: Localized = emptyMap(),
+    val subtitle: Localized = emptyMap(),
     val items: List<LearningItem> = emptyList(),
 )
 
-/** Карточка: слово, фраза или буква на якутском, перевод и подсказка (например, как произносить). */
+/** Карточка: слово, фраза или буква на якутском, переводы и подсказка (например, как произносить). */
 @Serializable
 data class LearningItem(
     val sah: String,
-    val ru: String,
-    val hint: String? = null,
+    /** Переводы: {"ru": "…", "en": "…"}. */
+    val tr: Localized = emptyMap(),
+    val hint: Localized = emptyMap(),
     /** Запись произношения (позже); null — записи нет. */
     val audio: String? = null,
 )

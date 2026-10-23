@@ -1,5 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Языки интерфейса. Якутский (sah) добавим, когда будет перевод строк. -->
+<!--
+    Языки интерфейса. По умолчанию — язык телефона; на Android 13+ язык можно выбрать
+    отдельно для приложения: Настройки → Приложения → Саҥарар кинигэ → Язык.
+    Якутский (sah) добавим сюда, когда будет готов res/values-sah/strings.xml.
+-->
 <locale-config xmlns:android="http://schemas.android.com/apk/res/android">
+    <locale android:name="en" />
     <locale android:name="ru" />
 </locale-config>

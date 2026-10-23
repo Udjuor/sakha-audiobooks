@@ -38,6 +38,7 @@ import ru.sakhabooks.app.R
 import ru.sakhabooks.app.data.Book
 import ru.sakhabooks.app.data.CatalogRepository
 import ru.sakhabooks.app.data.FavoritesStore
+import ru.sakhabooks.app.data.pick
 import ru.sakhabooks.app.ui.components.AssetImage
 import ru.sakhabooks.app.ui.components.FavoriteButton
 import ru.sakhabooks.app.ui.components.OrnamentBand
@@ -100,10 +101,11 @@ private fun BookCard(
             Spacer(Modifier.width(16.dp))
             Column(Modifier.weight(1f)) {
                 Text(book.titleSah, style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.SemiBold)
-                Text(book.author, style = MaterialTheme.typography.bodyMedium)
-                if (book.descriptionRu.isNotBlank()) {
+                Text(book.author.pick(), style = MaterialTheme.typography.bodyMedium)
+                val description = book.description.pick()
+                if (description.isNotBlank()) {
                     Spacer(Modifier.height(4.dp))
-                    Text(book.descriptionRu, style = MaterialTheme.typography.bodySmall)
+                    Text(description, style = MaterialTheme.typography.bodySmall)
                 }
                 Spacer(Modifier.height(8.dp))
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {

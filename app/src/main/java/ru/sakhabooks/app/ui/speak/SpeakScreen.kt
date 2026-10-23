@@ -39,6 +39,7 @@ import ru.sakhabooks.app.data.LearningFile
 import ru.sakhabooks.app.data.LearningItem
 import ru.sakhabooks.app.data.LearningRepository
 import ru.sakhabooks.app.data.LearningSection
+import ru.sakhabooks.app.data.pick
 import ru.sakhabooks.app.ui.components.TabScreen
 import javax.inject.Inject
 
@@ -97,9 +98,10 @@ private fun SectionCard(section: LearningSection, isExpanded: Boolean, onToggle:
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Column(Modifier.weight(1f)) {
-                Text(section.title, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
-                if (section.subtitle.isNotBlank()) {
-                    Text(section.subtitle, style = MaterialTheme.typography.bodySmall)
+                Text(section.title.pick(), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
+                val subtitle = section.subtitle.pick()
+                if (subtitle.isNotBlank()) {
+                    Text(subtitle, style = MaterialTheme.typography.bodySmall)
                 }
                 Text(
                     pluralStringResource(R.plurals.speak_cards_count, section.items.size, section.items.size),
@@ -131,8 +133,8 @@ private fun LearningRow(item: LearningItem) {
             style = MaterialTheme.typography.titleLarge,
             color = MaterialTheme.colorScheme.primary,
         )
-        Text(item.ru, style = MaterialTheme.typography.bodyLarge)
-        item.hint?.let {
+        Text(item.tr.pick(), style = MaterialTheme.typography.bodyLarge)
+        item.hint.pick().takeIf { it.isNotBlank() }?.let {
             Text(
                 it,
                 style = MaterialTheme.typography.bodySmall,

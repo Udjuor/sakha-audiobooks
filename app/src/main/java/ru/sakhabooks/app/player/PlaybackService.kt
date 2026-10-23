@@ -25,6 +25,7 @@ import ru.sakhabooks.app.R
 import ru.sakhabooks.app.data.Book
 import ru.sakhabooks.app.data.CatalogRepository
 import ru.sakhabooks.app.data.ProgressStore
+import ru.sakhabooks.app.data.pick
 import java.io.ByteArrayOutputStream
 import javax.inject.Inject
 
@@ -211,8 +212,8 @@ class PlaybackService : MediaSessionService() {
         val metadata = MediaMetadata.Builder()
             .setTitle(book.titleSah)
             .setDisplayTitle(book.titleSah)
-            .setArtist(book.author)
-            .setAlbumTitle(book.titleRu)
+            .setArtist(book.author.pick())
+            .setAlbumTitle(book.title.pick())
             .setArtworkData(artwork(book), MediaMetadata.PICTURE_TYPE_FRONT_COVER)
             .setIsPlayable(true)
             .setIsBrowsable(false)

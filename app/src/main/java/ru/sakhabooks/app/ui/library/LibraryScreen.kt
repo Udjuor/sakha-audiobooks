@@ -46,6 +46,7 @@ import ru.sakhabooks.app.data.Book
 import ru.sakhabooks.app.data.CatalogRepository
 import ru.sakhabooks.app.data.FavoritesStore
 import ru.sakhabooks.app.data.ProgressStore
+import ru.sakhabooks.app.data.pick
 import ru.sakhabooks.app.player.PlayerConnection
 import ru.sakhabooks.app.ui.catalog.BookCover
 import ru.sakhabooks.app.ui.components.FavoriteButton
@@ -193,7 +194,7 @@ private fun ShelfRow(
                     maxLines = 2,
                     overflow = TextOverflow.Ellipsis,
                 )
-                Text(item.book.author, style = MaterialTheme.typography.bodySmall)
+                Text(item.book.author.pick(), style = MaterialTheme.typography.bodySmall)
                 if (item.chapterId != null) {
                     Spacer(Modifier.height(6.dp))
                     if (item.isFinished) {

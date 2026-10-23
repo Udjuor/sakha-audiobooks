@@ -62,6 +62,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import java.util.Locale
 import ru.sakhabooks.app.R
+import ru.sakhabooks.app.data.pick
 import ru.sakhabooks.app.ui.catalog.BookCover
 import ru.sakhabooks.app.ui.components.AssetImage
 import ru.sakhabooks.app.ui.components.FavoriteButton
@@ -136,22 +137,23 @@ fun BookScreen(
                 )
                 Spacer(Modifier.height(12.dp))
                 Text(book.titleSah, style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.SemiBold)
-                Text(book.titleRu, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                Text(book.author, style = MaterialTheme.typography.bodyMedium)
+                Text(book.title.pick(), style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                Text(book.author.pick(), style = MaterialTheme.typography.bodyMedium)
             } else {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     BookCover(book, coverPath = null, sizeDp = 72)
                     Spacer(Modifier.width(16.dp))
                     Column {
                         Text(book.titleSah, style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.SemiBold)
-                        Text(book.author, style = MaterialTheme.typography.bodyMedium)
-                        Text(chapter.title, style = MaterialTheme.typography.bodySmall)
+                        Text(book.author.pick(), style = MaterialTheme.typography.bodyMedium)
+                        Text(chapter.title.pick(), style = MaterialTheme.typography.bodySmall)
                     }
                 }
             }
-            if (book.descriptionRu.isNotBlank()) {
+            val description = book.description.pick()
+            if (description.isNotBlank()) {
                 Spacer(Modifier.height(8.dp))
-                Text(book.descriptionRu, style = MaterialTheme.typography.bodyMedium)
+                Text(description, style = MaterialTheme.typography.bodyMedium)
             }
 
             Spacer(Modifier.height(16.dp))
@@ -211,7 +213,8 @@ fun BookScreen(
             HorizontalDivider(Modifier.padding(vertical = 12.dp))
 
             // Текст произведения
-            val hasTranslation = chapter.textRu.isNotBlank()
+            val translation = chapter.translation()
+            val hasTranslation = translation.isNotBlank()
             if (!hasTranslation) {
                 Text(
                     stringResource(R.string.translation_coming_soon),
@@ -226,7 +229,7 @@ fun BookScreen(
                     TextModeButton(textMode == TextMode.Sah, Icons.Outlined.Article, R.string.text_sah) {
                         textMode = TextMode.Sah
                     }
-                    TextModeButton(textMode == TextMode.Ru, Icons.Outlined.Translate, R.string.text_ru) {
+                    TextModeButton(textMode == TextMode.Ru, Icons.Outlined.Translate, R.string.text_translation) {
                         textMode = TextMode.Ru
                     }
                     TextModeButton(textMode == TextMode.Both, Icons.Outlined.ViewAgenda, R.string.text_both) {
@@ -240,7 +243,7 @@ fun BookScreen(
                 if (textMode == TextMode.Both) Spacer(Modifier.height(16.dp))
                 if (textMode != TextMode.Sah) {
                     Text(
-                        chapter.textRu,
+                        translation,
                         style = MaterialTheme.typography.bodyLarge,
                         color = if (textMode == TextMode.Both) MaterialTheme.colorScheme.onSurfaceVariant else MaterialTheme.colorScheme.onSurface,
                     )

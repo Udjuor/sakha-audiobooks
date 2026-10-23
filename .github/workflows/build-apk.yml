@@ -29,6 +29,10 @@ jobs:
           distribution: temurin
           java-version: 17
       - uses: gradle/actions/setup-gradle@v4
+      - name: Таблицы контента → файлы приложения
+        run: |
+          python3 tools/learning_csv.py to-json
+          python3 tools/strings_csv.py to-xml
       - name: Собрать debug-APK
         run: |
           set -o pipefail
