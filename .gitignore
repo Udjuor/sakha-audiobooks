@@ -10,3 +10,5 @@ captures/
 *.jks
 *.keystore
 keystore.properties
+# Исключение: открытый ключ для тестовых сборок (не для магазинов)
+!keystore/test-debug.keystore

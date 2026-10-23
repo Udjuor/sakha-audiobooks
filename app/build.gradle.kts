@@ -15,8 +15,20 @@ android {
         applicationId = "ru.sakhabooks.app"
         minSdk = 26
         targetSdk = 36
-        versionCode = 2
-        versionName = "0.1.0-demo"
+        versionCode = 3
+        versionName = "0.1.1-demo"
+    }
+
+    // Постоянный ключ для ТЕСТОВЫХ сборок: без него GitHub подписывал каждую сборку
+    // новым случайным ключом, и телефон отказывался ставить обновление поверх старой версии.
+    // Ключ для Google Play / RuStore — другой, секретный, и в репозиторий не кладётся.
+    signingConfigs {
+        getByName("debug") {
+            storeFile = rootProject.file("keystore/test-debug.keystore")
+            storePassword = "android"
+            keyAlias = "androiddebugkey"
+            keyPassword = "android"
+        }
     }
 
     buildTypes {
