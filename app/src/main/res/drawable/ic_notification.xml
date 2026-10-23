@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Маленький значок в строке состояния: раскрытая книга (одноцветный, как требует Android). -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp" android:height="24dp"
+    android:viewportWidth="24" android:viewportHeight="24">
+    <path android:fillColor="#FFFFFFFF"
+        android:pathData="M12,2.5 L14,4.5 L12,6.5 L10,4.5 Z" />
+    <path android:fillColor="#FFFFFFFF"
+        android:pathData="M3,9 C5.5,8 9,8.2 11.2,9.8 L11.2,21 C9,19.6 5.5,19.4 3,20.3 Z" />
+    <path android:fillColor="#FFFFFFFF"
+        android:pathData="M21,9 C18.5,8 15,8.2 12.8,9.8 L12.8,21 C15,19.6 18.5,19.4 21,20.3 Z" />
+</vector>

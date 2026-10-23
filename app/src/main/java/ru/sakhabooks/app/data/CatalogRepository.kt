@@ -27,6 +27,13 @@ class CatalogRepository @Inject constructor(
 
     fun book(id: String): Book? = catalog.books.firstOrNull { it.id == id }
 
+    /** Книга, которой принадлежит глава (плеер знает только номер главы). */
+    fun bookOfChapter(chapterId: String): Book? =
+        catalog.books.firstOrNull { book -> book.chapters.any { it.id == chapterId } }
+
+    fun chapter(chapterId: String): Chapter? =
+        bookOfChapter(chapterId)?.chapters?.firstOrNull { it.id == chapterId }
+
     /** Адрес аудио для плеера: встроенный файл из assets. null — аудио ещё нет. */
     fun audioUri(chapter: Chapter): String? = chapter.audio?.let { "asset:///$DEMO_DIR/$it" }
 

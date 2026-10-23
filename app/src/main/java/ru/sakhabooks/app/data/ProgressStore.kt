@@ -6,7 +6,7 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 import javax.inject.Singleton
 
-/** Запоминает место остановки в каждой главе. */
+/** Запоминает место остановки в каждой главе и выбранную скорость. */
 @Singleton
 class ProgressStore @Inject constructor(
     @ApplicationContext context: Context,
@@ -17,5 +17,15 @@ class ProgressStore @Inject constructor(
 
     fun save(chapterId: String, positionMs: Long) {
         prefs.edit { putLong(chapterId, positionMs) }
+    }
+
+    fun speed(): Float = prefs.getFloat(KEY_SPEED, 1f)
+
+    fun saveSpeed(speed: Float) {
+        prefs.edit { putFloat(KEY_SPEED, speed) }
+    }
+
+    private companion object {
+        const val KEY_SPEED = "playback_speed"
     }
 }

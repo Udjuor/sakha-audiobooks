@@ -11,6 +11,11 @@ import ru.sakhabooks.app.ui.theme.SakhaBooksTheme
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
+    companion object {
+        /** Признак «открыть экран играющей книги» — приходит при нажатии на уведомление плеера. */
+        const val EXTRA_OPEN_NOW_PLAYING = "open_now_playing"
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         installSplashScreen()
         super.onCreate(savedInstanceState)
