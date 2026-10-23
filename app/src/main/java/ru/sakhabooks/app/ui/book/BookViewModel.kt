@@ -15,6 +15,7 @@ import ru.sakhabooks.app.data.CatalogRepository
 import ru.sakhabooks.app.data.Chapter
 import ru.sakhabooks.app.data.FavoritesStore
 import ru.sakhabooks.app.data.ProgressStore
+import ru.sakhabooks.app.data.ReadingStore
 import ru.sakhabooks.app.player.NowPlaying
 import ru.sakhabooks.app.player.PlayerConnection
 import ru.sakhabooks.app.ui.navigation.BookRoute
@@ -34,6 +35,7 @@ class BookViewModel @Inject constructor(
     private val progress: ProgressStore,
     private val player: PlayerConnection,
     private val favorites: FavoritesStore,
+    private val reading: ReadingStore,
 ) : ViewModel() {
 
     val book: Book? = repository.book(savedStateHandle.toRoute<BookRoute>().bookId)
@@ -51,6 +53,20 @@ class BookViewModel @Inject constructor(
 
     init {
         if (hasAudio) player.connect()
+    }
+
+    /** Закладка: место в тексте, с которого открыть книгу. */
+    val bookmarkOffset: Int? = chapter?.let { reading.offset(it.id) }
+
+    fun saveBookmark(offset: Int?) {
+        chapter?.let { reading.saveOffset(it.id, offset) }
+    }
+
+    /** Режим текста (якутский / перевод / оба), выбранный для этой книги в прошлый раз. */
+    val savedTextMode: String? = chapter?.let { reading.textMode(it.id) }
+
+    fun saveTextMode(mode: String) {
+        chapter?.let { reading.saveTextMode(it.id, mode) }
     }
 
     fun toggleFavorite() {

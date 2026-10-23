@@ -23,6 +23,12 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
@@ -50,6 +56,10 @@ fun PagedReader(
     text: AnnotatedString,
     style: TextStyle,
     modifier: Modifier = Modifier,
+    /** Закладка: место в тексте, с которого открыть книгу; null — открыть на обложке. */
+    initialOffset: Int? = null,
+    /** Сообщает место в тексте открытой страницы (null — открыта обложка), чтобы сохранить закладку. */
+    onPositionChanged: (Int?) -> Unit = {},
     coverPage: @Composable () -> Unit,
     controls: @Composable RowScope.() -> Unit = {},
 ) {
@@ -60,13 +70,24 @@ fun PagedReader(
         val measurer = rememberTextMeasurer(cacheSize = 0)
         val pages = remember(text, style, widthPx, heightPx) {
             if (widthPx <= 0 || heightPx <= 0) {
-                listOf(text)
+                listOf(Page(0, text))
             } else {
                 paginate(measurer.measure(text, style, constraints = Constraints(maxWidth = widthPx)), text, heightPx)
             }
         }
-        val pagerState = rememberPagerState(pageCount = { pages.size + 1 })
+        // Текущее место в тексте переживает пересчёт страниц (поворот экрана, смена режима текста)
+        var position by rememberSaveable(text.text) { mutableStateOf(initialOffset) }
+        val pagerState = rememberPagerState(initialPage = pageFor(pages, position)) { pages.size + 1 }
         val scope = rememberCoroutineScope()
+
+        LaunchedEffect(pages) {
+            val target = pageFor(pages, position)
+            if (target != pagerState.currentPage) pagerState.scrollToPage(target)
+            snapshotFlow { pagerState.settledPage }.collect { page ->
+                position = if (page == 0) null else pages.getOrNull(page - 1)?.start
+                onPositionChanged(position)
+            }
+        }
 
         Column(Modifier.fillMaxSize()) {
             HorizontalPager(
@@ -78,7 +99,7 @@ fun PagedReader(
                     coverPage()
                 } else {
                     Text(
-                        pages[page - 1],
+                        pages[page - 1].text,
                         style = style,
                         modifier = Modifier
                             .fillMaxSize()
@@ -131,9 +152,19 @@ private fun CoroutineScope.turn(state: PagerState, delta: Int) {
     if (target != state.currentPage) launch { state.animateScrollToPage(target) }
 }
 
+/** Страница текста и номер её первого символа в тексте. */
+private class Page(val start: Int, val text: AnnotatedString)
+
+/** Страница пейджера, на которой находится место [offset]: 0 — обложка, дальше — страницы текста. */
+private fun pageFor(pages: List<Page>, offset: Int?): Int {
+    if (offset == null) return 0
+    val index = pages.indexOfLast { it.start <= offset }
+    return if (index < 0) 1 else index + 1
+}
+
 /** Режет свёрстанный текст на страницы по строкам: на страницу — столько строк, сколько влезает. */
-private fun paginate(layout: TextLayoutResult, text: AnnotatedString, pageHeight: Int): List<AnnotatedString> {
-    val pages = mutableListOf<AnnotatedString>()
+private fun paginate(layout: TextLayoutResult, text: AnnotatedString, pageHeight: Int): List<Page> {
+    val pages = mutableListOf<Page>()
     var line = 0
     while (line < layout.lineCount) {
         // Пустые строки между абзацами в начале страницы не нужны
@@ -145,10 +176,10 @@ private fun paginate(layout: TextLayoutResult, text: AnnotatedString, pageHeight
         val start = layout.getLineStart(line)
         var end = layout.getLineEnd(last)
         while (end > start && text[end - 1].isWhitespace()) end--
-        pages += text.subSequence(start, end)
+        pages += Page(start, text.subSequence(start, end))
         line = last + 1
     }
-    return pages.ifEmpty { listOf(AnnotatedString("")) }
+    return pages.ifEmpty { listOf(Page(0, AnnotatedString(""))) }
 }
 
 private val PAGE_PADDING_H = 20.dp

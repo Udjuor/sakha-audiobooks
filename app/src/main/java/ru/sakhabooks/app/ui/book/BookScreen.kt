@@ -42,6 +42,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -84,7 +85,10 @@ fun BookScreen(
     val chapter = viewModel.chapter
     val state by viewModel.state.collectAsStateWithLifecycle()
     val isFavorite by viewModel.isFavorite.collectAsStateWithLifecycle()
-    var textMode by rememberSaveable { mutableStateOf(TextMode.Both) }
+    var textMode by rememberSaveable {
+        mutableStateOf(TextMode.entries.firstOrNull { it.name == viewModel.savedTextMode } ?: TextMode.Both)
+    }
+    LaunchedEffect(textMode) { viewModel.saveTextMode(textMode.name) }
 
     // Android 13+: один раз спрашиваем разрешение на уведомления при первом «Слушать»
     val context = LocalContext.current
@@ -190,6 +194,9 @@ fun BookScreen(
             text = readerText,
             style = MaterialTheme.typography.bodyLarge.copy(color = MaterialTheme.colorScheme.onSurface),
             modifier = Modifier.weight(1f).fillMaxWidth(),
+            // Закладка действует для того режима текста, в котором её оставили
+            initialOffset = viewModel.bookmarkOffset.takeIf { textMode.name == viewModel.savedTextMode || viewModel.savedTextMode == null },
+            onPositionChanged = viewModel::saveBookmark,
             coverPage = {
                 CoverPage(
                     book = book,
