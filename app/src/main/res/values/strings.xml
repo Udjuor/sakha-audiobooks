@@ -31,6 +31,10 @@
     <string name="text_sah">Yakut text</string>
     <string name="text_translation">Translation</string>
     <string name="text_both">Yakut text and translation together</string>
+    <string name="reader_swipe_hint">Swipe to read →</string>
+    <string name="page_number">%1$d / %2$d</string>
+    <string name="page_previous">Previous page</string>
+    <string name="page_next">Next page</string>
     <string name="notification_channel_name">Listening to books</string>
     <string name="audio_coming_soon">🎧 A recording performed by an actor is coming soon.</string>
     <string name="translation_coming_soon">The English translation is in progress. The Yakut text is available now.</string>

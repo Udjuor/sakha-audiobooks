@@ -55,13 +55,17 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import java.util.Locale
 import ru.sakhabooks.app.R
+import ru.sakhabooks.app.data.Book
 import ru.sakhabooks.app.data.pick
 import ru.sakhabooks.app.ui.catalog.BookCover
 import ru.sakhabooks.app.ui.components.AssetImage
@@ -117,62 +121,20 @@ fun BookScreen(
 
         if (book == null || chapter == null) {
             Text(stringResource(R.string.book_not_found), Modifier.padding(16.dp))
-        } else Column(
-            Modifier
-                .fillMaxSize()
-                .verticalScroll(rememberScrollState())
-                .padding(16.dp),
-        ) {
-            val coverPath = viewModel.coverPath
-            if (coverPath != null) {
-                // Иллюстрация во всю ширину
-                AssetImage(
-                    path = coverPath,
-                    contentDescription = book.titleSah,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clip(RoundedCornerShape(12.dp)),
-                    // Горизонтальная иллюстрация — целиком; вертикальная — квадратом, чтобы плеер не уехал вниз
-                    aspectRatioFor = { it.coerceAtLeast(1f) },
-                )
-                Spacer(Modifier.height(12.dp))
-                Text(book.titleSah, style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.SemiBold)
-                Text(book.title.pick(), style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                Text(book.author.pick(), style = MaterialTheme.typography.bodyMedium)
-            } else {
+            return@Column
+        }
+
+        // Плеер — компактно сверху, чтобы книге осталось больше места
+        if (viewModel.hasAudio) {
+            Column(Modifier.padding(horizontal = 16.dp)) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    BookCover(book, coverPath = null, sizeDp = 72)
-                    Spacer(Modifier.width(16.dp))
-                    Column {
-                        Text(book.titleSah, style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.SemiBold)
-                        Text(book.author.pick(), style = MaterialTheme.typography.bodyMedium)
-                        Text(chapter.title.pick(), style = MaterialTheme.typography.bodySmall)
-                    }
-                }
-            }
-            val description = book.description.pick()
-            if (description.isNotBlank()) {
-                Spacer(Modifier.height(8.dp))
-                Text(description, style = MaterialTheme.typography.bodyMedium)
-            }
-
-            Spacer(Modifier.height(16.dp))
-
-            // Плеер
-            if (!viewModel.hasAudio) {
-                Text(
-                    stringResource(R.string.audio_coming_soon),
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                )
-            } else {
-                Slider(
-                    value = state.positionMs.toFloat(),
-                    onValueChange = { viewModel.seekTo(it.toLong()) },
-                    valueRange = 0f..state.durationMs.coerceAtLeast(1L).toFloat(),
-                )
-                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
                     Text(formatTime(state.positionMs), style = MaterialTheme.typography.labelMedium)
+                    Slider(
+                        value = state.positionMs.toFloat(),
+                        onValueChange = { viewModel.seekTo(it.toLong()) },
+                        valueRange = 0f..state.durationMs.coerceAtLeast(1L).toFloat(),
+                        modifier = Modifier.weight(1f).padding(horizontal = 8.dp),
+                    )
                     Text(formatTime(state.durationMs), style = MaterialTheme.typography.labelMedium)
                 }
                 Row(
@@ -183,20 +145,19 @@ fun BookScreen(
                     IconButton(onClick = { viewModel.seekBy(-SEEK_MS) }) {
                         Icon(Icons.Filled.FastRewind, contentDescription = stringResource(R.string.player_back_15))
                     }
-                    Spacer(Modifier.width(16.dp))
-                    FilledIconButton(onClick = onPlayPause, modifier = Modifier.size(64.dp)) {
+                    Spacer(Modifier.width(12.dp))
+                    FilledIconButton(onClick = onPlayPause, modifier = Modifier.size(52.dp)) {
                         Icon(
                             if (state.isPlaying) Icons.Filled.Pause else Icons.Filled.PlayArrow,
                             contentDescription = stringResource(if (state.isPlaying) R.string.player_pause else R.string.player_play),
-                            modifier = Modifier.size(36.dp),
+                            modifier = Modifier.size(30.dp),
                         )
                     }
-                    Spacer(Modifier.width(16.dp))
+                    Spacer(Modifier.width(12.dp))
                     IconButton(onClick = { viewModel.seekBy(SEEK_MS) }) {
                         Icon(Icons.Filled.FastForward, contentDescription = stringResource(R.string.player_forward_15))
                     }
-                }
-                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
+                    Spacer(Modifier.width(12.dp))
                     // Значок скорости и само число; полное название — для экранного диктора
                     val speedLabel = stringResource(R.string.player_speed, formatSpeed(state.speed))
                     TextButton(
@@ -209,23 +170,37 @@ fun BookScreen(
                     }
                 }
             }
+            HorizontalDivider()
+        }
 
-            HorizontalDivider(Modifier.padding(vertical = 12.dp))
-
-            // Текст произведения
-            val translation = chapter.translation()
-            val hasTranslation = translation.isNotBlank()
-            if (!hasTranslation) {
-                Text(
-                    stringResource(R.string.translation_coming_soon),
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+        // Книга, которую листают: обложка, затем страницы текста
+        val translation = chapter.translation()
+        val hasTranslation = translation.isNotBlank()
+        val translationColor = MaterialTheme.colorScheme.onSurfaceVariant
+        val readerText = remember(chapter.textSah, translation, textMode, hasTranslation, translationColor) {
+            buildAnnotatedString {
+                val mode = if (hasTranslation) textMode else TextMode.Sah
+                if (mode != TextMode.Ru) append(chapter.textSah)
+                if (mode == TextMode.Both) append("\n\n")
+                if (mode == TextMode.Ru) append(translation)
+                if (mode == TextMode.Both) withStyle(SpanStyle(color = translationColor)) { append(translation) }
+            }
+        }
+        PagedReader(
+            text = readerText,
+            style = MaterialTheme.typography.bodyLarge.copy(color = MaterialTheme.colorScheme.onSurface),
+            modifier = Modifier.weight(1f).fillMaxWidth(),
+            coverPage = {
+                CoverPage(
+                    book = book,
+                    coverPath = viewModel.coverPath,
+                    hasAudio = viewModel.hasAudio,
+                    hasTranslation = hasTranslation,
                 )
-                Spacer(Modifier.height(12.dp))
-                Text(chapter.textSah, style = MaterialTheme.typography.bodyLarge)
-            } else {
-                // Режим текста — значками: оригинал, перевод, оба
-                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            },
+            controls = {
+                if (hasTranslation) {
+                    // Режим текста — значками: оригинал, перевод, оба
                     TextModeButton(textMode == TextMode.Sah, Icons.Outlined.Article, R.string.text_sah) {
                         textMode = TextMode.Sah
                     }
@@ -236,20 +211,56 @@ fun BookScreen(
                         textMode = TextMode.Both
                     }
                 }
-                Spacer(Modifier.height(12.dp))
-                if (textMode != TextMode.Ru) {
-                    Text(chapter.textSah, style = MaterialTheme.typography.bodyLarge)
-                }
-                if (textMode == TextMode.Both) Spacer(Modifier.height(16.dp))
-                if (textMode != TextMode.Sah) {
-                    Text(
-                        translation,
-                        style = MaterialTheme.typography.bodyLarge,
-                        color = if (textMode == TextMode.Both) MaterialTheme.colorScheme.onSurfaceVariant else MaterialTheme.colorScheme.onSurface,
-                    )
-                }
-            }
+            },
+        )
+    }
+}
+
+/** Первая страница книги: иллюстрация, название, описание. */
+@Composable
+private fun CoverPage(book: Book, coverPath: String?, hasAudio: Boolean, hasTranslation: Boolean) {
+    Column(
+        Modifier
+            .fillMaxSize()
+            .verticalScroll(rememberScrollState())
+            .padding(16.dp),
+    ) {
+        if (coverPath != null) {
+            AssetImage(
+                path = coverPath,
+                contentDescription = book.titleSah,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clip(RoundedCornerShape(12.dp)),
+                // Горизонтальная иллюстрация — целиком; вертикальная — квадратом
+                aspectRatioFor = { it.coerceAtLeast(1f) },
+            )
+        } else {
+            BookCover(book, coverPath = null, sizeDp = 96)
         }
+        Spacer(Modifier.height(12.dp))
+        Text(book.titleSah, style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.SemiBold)
+        Text(book.title.pick(), style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        Text(book.author.pick(), style = MaterialTheme.typography.bodyMedium)
+        val description = book.description.pick()
+        if (description.isNotBlank()) {
+            Spacer(Modifier.height(8.dp))
+            Text(description, style = MaterialTheme.typography.bodyMedium)
+        }
+        val notes = listOfNotNull(
+            R.string.audio_coming_soon.takeIf { !hasAudio },
+            R.string.translation_coming_soon.takeIf { !hasTranslation },
+        )
+        notes.forEach {
+            Spacer(Modifier.height(8.dp))
+            Text(stringResource(it), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        }
+        Spacer(Modifier.height(16.dp))
+        Text(
+            stringResource(R.string.reader_swipe_hint),
+            style = MaterialTheme.typography.labelLarge,
+            color = MaterialTheme.colorScheme.secondary,
+        )
     }
 }
 

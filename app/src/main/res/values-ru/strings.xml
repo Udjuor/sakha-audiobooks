@@ -31,6 +31,10 @@
     <string name="text_sah">Текст на якутском</string>
     <string name="text_translation">Перевод</string>
     <string name="text_both">Якутский текст и перевод вместе</string>
+    <string name="reader_swipe_hint">Листайте, чтобы читать →</string>
+    <string name="page_number">%1$d / %2$d</string>
+    <string name="page_previous">Предыдущая страница</string>
+    <string name="page_next">Следующая страница</string>
     <string name="notification_channel_name">Прослушивание книг</string>
     <string name="audio_coming_soon">🎧 Аудиозапись в исполнении актёра скоро появится.</string>
     <string name="translation_coming_soon">Русский перевод готовится. Пока доступен текст на якутском.</string>
