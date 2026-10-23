@@ -20,6 +20,7 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.BiasAlignment
 import androidx.compose.ui.Modifier
@@ -29,20 +30,28 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
+import kotlinx.coroutines.flow.StateFlow
 import ru.sakhabooks.app.R
 import ru.sakhabooks.app.data.Book
 import ru.sakhabooks.app.data.CatalogRepository
+import ru.sakhabooks.app.data.FavoritesStore
 import ru.sakhabooks.app.ui.components.AssetImage
+import ru.sakhabooks.app.ui.components.FavoriteButton
 import ru.sakhabooks.app.ui.components.OrnamentBand
 import ru.sakhabooks.app.ui.components.TabScreen
-import javax.inject.Inject
 
 @HiltViewModel
 class CatalogViewModel @Inject constructor(
     private val repository: CatalogRepository,
+    private val favorites: FavoritesStore,
 ) : ViewModel() {
     val books: List<Book> = repository.books()
+    val favoriteIds: StateFlow<Set<String>> = favorites.ids
+
+    fun toggleFavorite(bookId: String) = favorites.toggle(bookId)
 
     fun coverPath(book: Book): String? = repository.coverPath(book)
 }
@@ -52,6 +61,7 @@ fun CatalogScreen(
     onOpenBook: (String) -> Unit,
     viewModel: CatalogViewModel = hiltViewModel(),
 ) {
+    val favoriteIds by viewModel.favoriteIds.collectAsStateWithLifecycle()
     TabScreen(title = stringResource(R.string.catalog_title)) {
         Text(stringResource(R.string.app_tagline), style = MaterialTheme.typography.titleMedium)
         Spacer(Modifier.height(16.dp))
@@ -60,7 +70,13 @@ fun CatalogScreen(
         } else {
             LazyColumn(verticalArrangement = Arrangement.spacedBy(12.dp)) {
                 items(viewModel.books, key = { it.id }) { book ->
-                    BookCard(book = book, coverPath = viewModel.coverPath(book), onClick = { onOpenBook(book.id) })
+                    BookCard(
+                        book = book,
+                        coverPath = viewModel.coverPath(book),
+                        isFavorite = book.id in favoriteIds,
+                        onToggleFavorite = { viewModel.toggleFavorite(book.id) },
+                        onClick = { onOpenBook(book.id) },
+                    )
                 }
             }
         }
@@ -68,12 +84,18 @@ fun CatalogScreen(
 }
 
 @Composable
-private fun BookCard(book: Book, coverPath: String?, onClick: () -> Unit) {
+private fun BookCard(
+    book: Book,
+    coverPath: String?,
+    isFavorite: Boolean,
+    onToggleFavorite: () -> Unit,
+    onClick: () -> Unit,
+) {
     Card(
         modifier = Modifier.fillMaxWidth().clickable(onClick = onClick),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainer),
     ) {
-        Row(Modifier.padding(12.dp), verticalAlignment = Alignment.CenterVertically) {
+        Row(Modifier.padding(12.dp), verticalAlignment = Alignment.Top) {
             BookCover(book, coverPath)
             Spacer(Modifier.width(16.dp))
             Column(Modifier.weight(1f)) {
@@ -89,6 +111,7 @@ private fun BookCard(book: Book, coverPath: String?, onClick: () -> Unit) {
                     if (book.isFree) Badge(stringResource(R.string.badge_free))
                 }
             }
+            FavoriteButton(isFavorite, onToggleFavorite)
         }
     }
 }

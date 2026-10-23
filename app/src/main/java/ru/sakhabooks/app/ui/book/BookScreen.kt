@@ -4,9 +4,9 @@ import android.Manifest
 import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Build
-import androidx.annotation.StringRes
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -49,22 +49,23 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.semantics.contentDescription
-import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.core.content.ContextCompat
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import java.util.Locale
 import ru.sakhabooks.app.R
 import ru.sakhabooks.app.ui.catalog.BookCover
 import ru.sakhabooks.app.ui.components.AssetImage
+import ru.sakhabooks.app.ui.components.FavoriteButton
 import ru.sakhabooks.app.ui.components.OrnamentBand
-import java.util.Locale
 
 private enum class TextMode { Sah, Ru, Both }
 
@@ -77,6 +78,7 @@ fun BookScreen(
     val book = viewModel.book
     val chapter = viewModel.chapter
     val state by viewModel.state.collectAsStateWithLifecycle()
+    val isFavorite by viewModel.isFavorite.collectAsStateWithLifecycle()
     var textMode by rememberSaveable { mutableStateOf(TextMode.Both) }
 
     // Android 13+: один раз спрашиваем разрешение на уведомления при первом «Слушать»
@@ -101,6 +103,9 @@ fun BookScreen(
     Column(Modifier.fillMaxSize()) {
         TopAppBar(
             title = { Text(book?.titleSah ?: "", style = MaterialTheme.typography.headlineSmall) },
+            actions = {
+                if (book != null) FavoriteButton(isFavorite, viewModel::toggleFavorite)
+            },
             navigationIcon = {
                 IconButton(onClick = onBack) {
                     Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.back))

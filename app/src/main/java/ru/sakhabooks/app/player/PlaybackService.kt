@@ -119,7 +119,7 @@ class PlaybackService : MediaSessionService() {
         override fun onPlaybackStateChanged(playbackState: Int) {
             if (playbackState == Player.STATE_ENDED) {
                 // Дослушали до конца — в следующий раз начнём сначала
-                session?.player?.currentMediaItem?.mediaId?.let { progress.save(it, 0L) }
+                session?.player?.currentMediaItem?.mediaId?.let(progress::markFinished)
             }
         }
 
@@ -132,7 +132,8 @@ class PlaybackService : MediaSessionService() {
         val player = session?.player ?: return
         val chapterId = player.currentMediaItem?.mediaId ?: return
         if (player.playbackState == Player.STATE_ENDED) return
-        progress.save(chapterId, player.currentPosition)
+        val duration = player.duration.takeIf { it != C.TIME_UNSET } ?: 0L
+        progress.save(chapterId, player.currentPosition, duration)
     }
 
     /** Кнопки «назад/вперёд на 15 секунд» в уведомлении и на экране блокировки. */

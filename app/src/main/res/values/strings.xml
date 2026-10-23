@@ -38,7 +38,14 @@
 
     <!-- Мин кинигэлэрим (мои книги) -->
     <string name="library_title">Мин кинигэлэрим</string>
-    <string name="library_empty">Вы ещё ничего не слушали. Выберите книгу в каталоге.</string>
+    <string name="library_listening">Слушаю</string>
+    <string name="library_favorites">Избранное</string>
+    <string name="library_listening_empty">Здесь появятся книги, которые вы начали слушать.</string>
+    <string name="library_favorites_empty">Отметьте книгу сердечком — она появится здесь.</string>
+    <string name="library_continue">Продолжить</string>
+    <string name="library_finished">Прослушано</string>
+    <string name="favorite_add">Добавить в избранное</string>
+    <string name="favorite_remove">Убрать из избранного</string>
 
     <!-- Сахалыы саҥар -->
     <string name="speak_title">Сахалыы саҥар</string>

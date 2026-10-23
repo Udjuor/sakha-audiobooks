@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
 import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
@@ -12,11 +13,11 @@ import kotlinx.coroutines.flow.stateIn
 import ru.sakhabooks.app.data.Book
 import ru.sakhabooks.app.data.CatalogRepository
 import ru.sakhabooks.app.data.Chapter
+import ru.sakhabooks.app.data.FavoritesStore
 import ru.sakhabooks.app.data.ProgressStore
 import ru.sakhabooks.app.player.NowPlaying
 import ru.sakhabooks.app.player.PlayerConnection
 import ru.sakhabooks.app.ui.navigation.BookRoute
-import javax.inject.Inject
 
 data class PlayerUiState(
     val isPlaying: Boolean = false,
@@ -32,6 +33,7 @@ class BookViewModel @Inject constructor(
     repository: CatalogRepository,
     private val progress: ProgressStore,
     private val player: PlayerConnection,
+    private val favorites: FavoritesStore,
 ) : ViewModel() {
 
     val book: Book? = repository.book(savedStateHandle.toRoute<BookRoute>().bookId)
@@ -43,8 +45,16 @@ class BookViewModel @Inject constructor(
         .map(::toUiState)
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), toUiState(player.state.value))
 
+    val isFavorite: StateFlow<Boolean> = favorites.ids
+        .map { book?.id in it }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), book?.id in favorites.ids.value)
+
     init {
         if (hasAudio) player.connect()
+    }
+
+    fun toggleFavorite() {
+        book?.let { favorites.toggle(it.id) }
     }
 
     /** Если играет эта глава — показываем живое состояние плеера, иначе — сохранённое место. */

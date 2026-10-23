@@ -86,7 +86,7 @@ fun AppRoot(
         ) {
             composable<CatalogRoute> { CatalogScreen(onOpenBook = openBook) }
             composable<BookRoute> { BookScreen(onBack = { navController.popBackStack() }) }
-            composable<LibraryRoute> { LibraryScreen() }
+            composable<LibraryRoute> { LibraryScreen(onOpenBook = openBook) }
             composable<SpeakRoute> { SpeakScreen() }
             composable<ProfileRoute> { ProfileScreen() }
         }
