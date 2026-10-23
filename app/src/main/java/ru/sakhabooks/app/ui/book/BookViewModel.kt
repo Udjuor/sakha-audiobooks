@@ -14,6 +14,7 @@ import ru.sakhabooks.app.data.CatalogRepository
 import ru.sakhabooks.app.data.Chapter
 import ru.sakhabooks.app.data.FavoritesStore
 import ru.sakhabooks.app.data.ReadingStore
+import ru.sakhabooks.app.data.pick
 import ru.sakhabooks.app.player.PlayerConnection
 import ru.sakhabooks.app.ui.navigation.BookRoute
 import javax.inject.Inject
@@ -32,6 +33,10 @@ class BookViewModel @Inject constructor(
     val chapter: Chapter? = book?.chapters?.firstOrNull()
     val coverPath: String? = book?.let(repository::coverPath)
     val hasAudio: Boolean = chapter?.let(repository::audioUri) != null
+
+    /** Для страницы «аннотация»: раздел каталога и длительность записи. */
+    val sectionTitle: String? = book?.section?.let { repository.section(it)?.title?.pick() }
+    val audioDurationSec: Int = if (hasAudio) chapter?.durationSec ?: 0 else 0
 
     val isFavorite: StateFlow<Boolean> = favorites.ids
         .map { book?.id in it }

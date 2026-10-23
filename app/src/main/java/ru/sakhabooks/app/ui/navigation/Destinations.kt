@@ -17,6 +17,7 @@ import ru.sakhabooks.app.R
 @Serializable data object PlayerRoute
 @Serializable data object SpeakRoute
 @Serializable data object ProfileRoute
+@Serializable data class SectionRoute(val sectionId: String)
 @Serializable data class BookRoute(val bookId: String)
 
 enum class TopLevelTab(

@@ -1,5 +1,14 @@
 {
-  "version": 2,
+  "version": 3,
+  "sections": [
+    {
+      "id": "folk-tales",
+      "title": {
+        "ru": "Народные сказки",
+        "en": "Folk tales"
+      }
+    }
+  ],
   "books": [
     {
       "id": "beyberikeen",
@@ -13,6 +22,7 @@
         "ru": "Якутская народная сказка",
         "en": "Yakut folk tale"
       },
+      "section": "folk-tales",
       "description": {
         "ru": "Старуха Бэйбэрикээн находит на лугу чудесную траву, и та превращается в красавицу. Её сватает сын Хайҕамсык Хара Хаана, но по дороге злой дух-абааһы крадёт облик невесты. Правду открывает говорящий конь Чоочугур Чуоҕур.",
         "en": "Old Beyberikeen finds a magical grass in the meadow, and it turns into a beautiful girl. The son of Khaigamsyk Khara Khaan asks for her hand, but on the way an evil abaasy spirit steals the bride's face. The talking horse Choochugur Chuogur reveals the truth."
@@ -48,6 +58,7 @@
         "ru": "Якутская народная сказка",
         "en": "Yakut folk tale"
       },
+      "section": "folk-tales",
       "description": {
         "ru": "Почему у зайца короткий хвост и чёрные кончики ушей. Когда-то хвост у Куобаха был длинным и пушистым, как у белки, — пока однажды зимой не примёрз ко льду у проруби.",
         "en": "Why the hare has a short tail and black ear tips. Long ago the Hare's tail was long and fluffy, like a squirrel's — until one winter it froze to the ice by a hole in the lake."
@@ -83,6 +94,7 @@
         "ru": "Якутская народная сказка",
         "en": "Yakut folk tale"
       },
+      "section": "folk-tales",
       "description": {
         "ru": "Пугливый заяц решил, что на свете нет никого несчастнее его, и пошёл топиться. Но у самой воды лягушка испугалась его самого — и заяц передумал.",
         "en": "A timid hare decided there was no one more miserable than him and went to drown himself. But at the water's edge a frog got scared of him — and the hare changed his mind."

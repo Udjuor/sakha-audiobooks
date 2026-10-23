@@ -6,8 +6,17 @@ import kotlinx.serialization.Serializable
 /** Формат файла каталога. Позже тот же формат будет отдавать сервер. */
 @Serializable
 data class CatalogFile(
-    val version: Int = 2,
+    val version: Int = 3,
+    /** Разделы каталога (жанры, серии): «Народные сказки», «Олоҥхо», «Поэзия»… */
+    val sections: List<CatalogSection> = emptyList(),
     val books: List<Book> = emptyList(),
+)
+
+@Serializable
+data class CatalogSection(
+    val id: String,
+    val title: Localized = emptyMap(),
+    val description: Localized = emptyMap(),
 )
 
 @Serializable
@@ -18,6 +27,8 @@ data class Book(
     /** Название на других языках: {"ru": "…", "en": "…"}. */
     val title: Localized = emptyMap(),
     val author: Localized = emptyMap(),
+    /** id раздела каталога, в котором лежит книга. */
+    val section: String? = null,
     val description: Localized = emptyMap(),
     @SerialName("is_free") val isFree: Boolean = true,
     @SerialName("is_demo") val isDemo: Boolean = false,

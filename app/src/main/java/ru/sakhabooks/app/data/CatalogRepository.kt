@@ -25,6 +25,20 @@ class CatalogRepository @Inject constructor(
 
     fun books(): List<Book> = catalog.books
 
+    /** Разделы, в которых есть книги. Книги без раздела попадают в общий раздел «Другое». */
+    fun sections(): List<CatalogSection> {
+        val known = catalog.sections.filter { section -> catalog.books.any { it.section == section.id } }
+        val orphans = catalog.books.any { book -> catalog.sections.none { it.id == book.section } }
+        return if (orphans) known + OTHER_SECTION else known
+    }
+
+    fun section(id: String): CatalogSection? = sections().firstOrNull { it.id == id }
+
+    fun booksIn(sectionId: String): List<Book> = catalog.books.filter { book ->
+        book.section == sectionId ||
+            (sectionId == OTHER_SECTION.id && catalog.sections.none { it.id == book.section })
+    }
+
     fun book(id: String): Book? = catalog.books.firstOrNull { it.id == id }
 
     /** Книга, которой принадлежит глава (плеер знает только номер главы). */
@@ -41,6 +55,7 @@ class CatalogRepository @Inject constructor(
     fun coverPath(book: Book): String? = book.cover?.let { "$DEMO_DIR/$it" }
 
     private companion object {
+        val OTHER_SECTION = CatalogSection("other", mapOf("ru" to "Другое", "en" to "Other"))
         const val DEMO_DIR = "demo"
         const val DEMO_CATALOG = "$DEMO_DIR/catalog.json"
     }

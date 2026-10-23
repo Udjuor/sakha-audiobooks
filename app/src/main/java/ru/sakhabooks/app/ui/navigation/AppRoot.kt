@@ -1,6 +1,7 @@
 package ru.sakhabooks.app.ui.navigation
 
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
@@ -23,6 +24,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emptyFlow
 import ru.sakhabooks.app.ui.book.BookScreen
 import ru.sakhabooks.app.ui.catalog.CatalogScreen
+import ru.sakhabooks.app.ui.catalog.SectionScreen
 import ru.sakhabooks.app.ui.library.LibraryScreen
 import ru.sakhabooks.app.ui.player.MiniPlayer
 import ru.sakhabooks.app.ui.player.MiniPlayerViewModel
@@ -55,16 +57,23 @@ fun AppRoot(
         openNowPlayingRequests.collect { openPlayer() }
     }
 
+    // В книге — чистая читалка: ни меню, ни мини-плеера
+    val isReading = currentDestination?.hasRoute(BookRoute::class) == true
+
     Scaffold(
+        // Отступы от краёв экрана каждый экран делает сам (у читалки их нет совсем)
+        contentWindowInsets = WindowInsets(0, 0, 0, 0),
         bottomBar = {
-            Column {
+            if (!isReading) Column {
                 // Во вкладке «Плеер» мини-плеер не нужен — там большой
                 if (currentDestination?.hasRoute(PlayerRoute::class) != true) {
                     MiniPlayer(onOpenPlayer = openPlayer, viewModel = miniPlayerViewModel)
                 }
                 NavigationBar {
                     TopLevelTab.entries.forEach { tab ->
-                        val selected = currentDestination?.hierarchy?.any { it.hasRoute(tab.route::class) } == true
+                        // Раздел каталога — тоже вкладка «Каталог»
+                        val selected = currentDestination?.hierarchy?.any { it.hasRoute(tab.route::class) } == true ||
+                            (tab == TopLevelTab.Catalog && currentDestination?.hasRoute(SectionRoute::class) == true)
                         NavigationBarItem(
                             selected = selected,
                             onClick = { openTab(tab) },
@@ -81,7 +90,8 @@ fun AppRoot(
             startDestination = CatalogRoute,
             modifier = Modifier.padding(padding),
         ) {
-            composable<CatalogRoute> { CatalogScreen(onOpenBook = openBook) }
+            composable<CatalogRoute> { CatalogScreen(onOpenSection = { navController.navigate(SectionRoute(it)) }) }
+            composable<SectionRoute> { SectionScreen(onBack = { navController.popBackStack() }, onOpenBook = openBook) }
             composable<BookRoute> { BookScreen(onBack = { navController.popBackStack() }, onOpenPlayer = openPlayer) }
             composable<PlayerRoute> { PlayerScreen(onOpenBook = openBook) }
             composable<LibraryRoute> { LibraryScreen(onOpenBook = openBook) }

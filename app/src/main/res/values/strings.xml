@@ -18,6 +18,11 @@
     <!-- Catalog -->
     <string name="catalog_title">Catalog</string>
     <string name="catalog_placeholder">Books will appear here: covers, authors and descriptions.</string>
+    <plurals name="catalog_books_count">
+        <item quantity="one">%d book</item>
+        <item quantity="other">%d books</item>
+    </plurals>
+    <string name="info_has_audio">Has a recording</string>
     <string name="badge_demo">Demo</string>
     <string name="badge_free">Free</string>
 
@@ -35,13 +40,20 @@
     <string name="text_sah">Yakut text</string>
     <string name="text_translation">Translation</string>
     <string name="text_both">Yakut text and translation together</string>
-    <string name="reader_swipe_hint">Swipe to read →</string>
+    <string name="about_title">About the book</string>
+    <string name="info_title">Title</string>
+    <string name="info_title_translated">Title in translation</string>
+    <string name="info_author">Author</string>
+    <string name="info_section">Section</string>
+    <string name="info_recording">Recording</string>
+    <string name="info_translation">Translation</string>
+    <string name="info_available">available</string>
+    <string name="info_not_yet">not yet</string>
+    <string name="reader_swipe_hint">Swipe to read →  ·  tap the centre of a page for the menu</string>
     <string name="page_number">%1$d / %2$d</string>
     <string name="page_previous">Previous page</string>
     <string name="page_next">Next page</string>
     <string name="notification_channel_name">Listening to books</string>
-    <string name="audio_coming_soon">🎧 A recording performed by an actor is coming soon.</string>
-    <string name="translation_coming_soon">The English translation is in progress. The Yakut text is available now.</string>
 
     <!-- Мин кинигэлэрим (my books) -->
     <string name="library_title">Мин кинигэлэрим</string>

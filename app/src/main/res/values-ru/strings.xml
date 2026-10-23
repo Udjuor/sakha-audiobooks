@@ -18,6 +18,13 @@
     <!-- Каталог -->
     <string name="catalog_title">Каталог</string>
     <string name="catalog_placeholder">Здесь появятся книги: обложки, авторы и описания.</string>
+    <plurals name="catalog_books_count">
+        <item quantity="one">%d книга</item>
+        <item quantity="few">%d книги</item>
+        <item quantity="many">%d книг</item>
+        <item quantity="other">%d книги</item>
+    </plurals>
+    <string name="info_has_audio">Есть аудиозапись</string>
     <string name="badge_demo">Демо</string>
     <string name="badge_free">Бесплатно</string>
 
@@ -35,13 +42,20 @@
     <string name="text_sah">Текст на якутском</string>
     <string name="text_translation">Перевод</string>
     <string name="text_both">Якутский текст и перевод вместе</string>
-    <string name="reader_swipe_hint">Листайте, чтобы читать →</string>
+    <string name="about_title">Аннотация</string>
+    <string name="info_title">Название</string>
+    <string name="info_title_translated">Название в переводе</string>
+    <string name="info_author">Автор</string>
+    <string name="info_section">Раздел</string>
+    <string name="info_recording">Аудиозапись</string>
+    <string name="info_translation">Перевод</string>
+    <string name="info_available">есть</string>
+    <string name="info_not_yet">пока нет</string>
+    <string name="reader_swipe_hint">Листайте влево →  ·  меню — касание середины страницы</string>
     <string name="page_number">%1$d / %2$d</string>
     <string name="page_previous">Предыдущая страница</string>
     <string name="page_next">Следующая страница</string>
     <string name="notification_channel_name">Прослушивание книг</string>
-    <string name="audio_coming_soon">🎧 Аудиозапись в исполнении актёра скоро появится.</string>
-    <string name="translation_coming_soon">Русский перевод готовится. Пока доступен текст на якутском.</string>
 
     <!-- Мин кинигэлэрим (мои книги) -->
     <string name="library_title">Мин кинигэлэрим</string>
