@@ -17,6 +17,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import ru.sakhabooks.app.ui.book.BookScreen
 import ru.sakhabooks.app.ui.catalog.CatalogScreen
 import ru.sakhabooks.app.ui.library.LibraryScreen
 import ru.sakhabooks.app.ui.profile.ProfileScreen
@@ -53,7 +54,8 @@ fun AppRoot() {
             startDestination = CatalogRoute,
             modifier = Modifier.padding(padding),
         ) {
-            composable<CatalogRoute> { CatalogScreen() }
+            composable<CatalogRoute> { CatalogScreen(onOpenBook = { navController.navigate(BookRoute(it)) }) }
+            composable<BookRoute> { BookScreen(onBack = { navController.popBackStack() }) }
             composable<LibraryRoute> { LibraryScreen() }
             composable<ProfileRoute> { ProfileScreen() }
         }

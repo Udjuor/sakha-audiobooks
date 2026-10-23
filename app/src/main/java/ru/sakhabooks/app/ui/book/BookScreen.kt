@@ -1,0 +1,174 @@
+package ru.sakhabooks.app.ui.book
+
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.FastForward
+import androidx.compose.material.icons.filled.FastRewind
+import androidx.compose.material.icons.filled.Pause
+import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FilledIconButton
+import androidx.compose.material3.FilterChip
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Slider
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.TopAppBar
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import ru.sakhabooks.app.R
+import ru.sakhabooks.app.ui.catalog.BookCover
+import ru.sakhabooks.app.ui.components.OrnamentBand
+import java.util.Locale
+
+private enum class TextMode { Sah, Ru, Both }
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun BookScreen(
+    onBack: () -> Unit,
+    viewModel: BookViewModel = hiltViewModel(),
+) {
+    val book = viewModel.book
+    val chapter = viewModel.chapter
+    val state by viewModel.state.collectAsStateWithLifecycle()
+    var textMode by rememberSaveable { mutableStateOf(TextMode.Both) }
+
+    Column(Modifier.fillMaxSize()) {
+        TopAppBar(
+            title = { Text(book?.titleSah ?: "", style = MaterialTheme.typography.headlineSmall) },
+            navigationIcon = {
+                IconButton(onClick = onBack) {
+                    Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.back))
+                }
+            },
+        )
+        OrnamentBand(Modifier.padding(horizontal = 16.dp))
+
+        if (book == null || chapter == null) {
+            Text(stringResource(R.string.book_not_found), Modifier.padding(16.dp))
+        } else Column(
+            Modifier
+                .fillMaxSize()
+                .verticalScroll(rememberScrollState())
+                .padding(16.dp),
+        ) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                BookCover(book, sizeDp = 72)
+                Spacer(Modifier.width(16.dp))
+                Column {
+                    Text(book.titleSah, style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.SemiBold)
+                    Text(book.author, style = MaterialTheme.typography.bodyMedium)
+                    Text(chapter.title, style = MaterialTheme.typography.bodySmall)
+                }
+            }
+
+            Spacer(Modifier.height(16.dp))
+
+            // Плеер
+            Slider(
+                value = state.positionMs.toFloat(),
+                onValueChange = { viewModel.seekTo(it.toLong()) },
+                valueRange = 0f..state.durationMs.coerceAtLeast(1L).toFloat(),
+            )
+            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                Text(formatTime(state.positionMs), style = MaterialTheme.typography.labelMedium)
+                Text(formatTime(state.durationMs), style = MaterialTheme.typography.labelMedium)
+            }
+            Row(
+                Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.Center,
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                IconButton(onClick = { viewModel.seekBy(-SEEK_MS) }) {
+                    Icon(Icons.Filled.FastRewind, contentDescription = stringResource(R.string.player_back_15))
+                }
+                Spacer(Modifier.width(16.dp))
+                FilledIconButton(onClick = viewModel::togglePlay, modifier = Modifier.size(64.dp)) {
+                    Icon(
+                        if (state.isPlaying) Icons.Filled.Pause else Icons.Filled.PlayArrow,
+                        contentDescription = stringResource(if (state.isPlaying) R.string.player_pause else R.string.player_play),
+                        modifier = Modifier.size(36.dp),
+                    )
+                }
+                Spacer(Modifier.width(16.dp))
+                IconButton(onClick = { viewModel.seekBy(SEEK_MS) }) {
+                    Icon(Icons.Filled.FastForward, contentDescription = stringResource(R.string.player_forward_15))
+                }
+            }
+            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
+                TextButton(onClick = viewModel::cycleSpeed) {
+                    Text(stringResource(R.string.player_speed, formatSpeed(state.speed)))
+                }
+            }
+
+            HorizontalDivider(Modifier.padding(vertical = 12.dp))
+
+            // Текст произведения
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                FilterChip(
+                    selected = textMode == TextMode.Sah,
+                    onClick = { textMode = TextMode.Sah },
+                    label = { Text(stringResource(R.string.text_sah)) },
+                )
+                FilterChip(
+                    selected = textMode == TextMode.Ru,
+                    onClick = { textMode = TextMode.Ru },
+                    label = { Text(stringResource(R.string.text_ru)) },
+                )
+                FilterChip(
+                    selected = textMode == TextMode.Both,
+                    onClick = { textMode = TextMode.Both },
+                    label = { Text(stringResource(R.string.text_both)) },
+                )
+            }
+            Spacer(Modifier.height(12.dp))
+            if (textMode != TextMode.Ru) {
+                Text(chapter.textSah, style = MaterialTheme.typography.bodyLarge)
+            }
+            if (textMode == TextMode.Both) Spacer(Modifier.height(16.dp))
+            if (textMode != TextMode.Sah) {
+                Text(
+                    chapter.textRu,
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = if (textMode == TextMode.Both) MaterialTheme.colorScheme.onSurfaceVariant else MaterialTheme.colorScheme.onSurface,
+                )
+            }
+        }
+    }
+}
+
+private const val SEEK_MS = 15_000L
+
+private fun formatTime(ms: Long): String {
+    val total = ms / 1000
+    return String.format(Locale.ROOT, "%d:%02d", total / 60, total % 60)
+}
+
+private fun formatSpeed(speed: Float): String =
+    if (speed % 1f == 0f) "${speed.toInt()}×" else "${speed}×".replace('.', ',')

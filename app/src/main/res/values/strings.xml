@@ -17,6 +17,21 @@
     <string name="catalog_title">Каталог</string>
     <string name="catalog_placeholder">Здесь появятся книги: обложки, авторы и описания.</string>
 
+    <string name="badge_demo">Демо</string>
+    <string name="badge_free">Бесплатно</string>
+
+    <!-- Книга и плеер -->
+    <string name="back">Назад</string>
+    <string name="book_not_found">Книга не найдена.</string>
+    <string name="player_play">Слушать</string>
+    <string name="player_pause">Пауза</string>
+    <string name="player_back_15">Назад на 15 секунд</string>
+    <string name="player_forward_15">Вперёд на 15 секунд</string>
+    <string name="player_speed">Скорость %1$s</string>
+    <string name="text_sah">Саха</string>
+    <string name="text_ru">Русский</string>
+    <string name="text_both">Оба</string>
+
     <!-- Мин кинигэлэрим (мои книги) -->
     <string name="library_title">Мин кинигэлэрим</string>
     <string name="library_empty">Вы ещё ничего не слушали. Выберите книгу в каталоге.</string>

@@ -9,10 +9,11 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import kotlinx.serialization.Serializable
 import ru.sakhabooks.app.R
 
-// Адреса экранов. Новые экраны (книга, плеер, текст) добавим сюда же.
+// Адреса экранов.
 @Serializable data object CatalogRoute
 @Serializable data object LibraryRoute
 @Serializable data object ProfileRoute
+@Serializable data class BookRoute(val bookId: String)
 
 enum class TopLevelTab(
     val route: Any,
