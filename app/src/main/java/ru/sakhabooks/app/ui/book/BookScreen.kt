@@ -1,5 +1,11 @@
 package ru.sakhabooks.app.ui.book
 
+import android.Manifest
+import android.content.Context
+import android.content.pm.PackageManager
+import android.os.Build
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.Column
@@ -34,12 +40,15 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.core.content.ContextCompat
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -62,6 +71,25 @@ fun BookScreen(
     val chapter = viewModel.chapter
     val state by viewModel.state.collectAsStateWithLifecycle()
     var textMode by rememberSaveable { mutableStateOf(TextMode.Both) }
+
+    // Android 13+: без разрешения на уведомления звук играет, но кнопок в шторке не будет
+    val context = LocalContext.current
+    var notificationsAllowed by remember { mutableStateOf(notificationsGranted(context)) }
+    var askedForNotifications by rememberSaveable { mutableStateOf(false) }
+    val notificationPermission = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
+        notificationsAllowed = granted
+        viewModel.togglePlay()
+    }
+    val onPlayPause = {
+        if (!state.isPlaying && !notificationsAllowed && !askedForNotifications &&
+            Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU
+        ) {
+            askedForNotifications = true
+            notificationPermission.launch(Manifest.permission.POST_NOTIFICATIONS)
+        } else {
+            viewModel.togglePlay()
+        }
+    }
 
     Column(Modifier.fillMaxSize()) {
         TopAppBar(
@@ -141,7 +169,7 @@ fun BookScreen(
                         Icon(Icons.Filled.FastRewind, contentDescription = stringResource(R.string.player_back_15))
                     }
                     Spacer(Modifier.width(16.dp))
-                    FilledIconButton(onClick = viewModel::togglePlay, modifier = Modifier.size(64.dp)) {
+                    FilledIconButton(onClick = onPlayPause, modifier = Modifier.size(64.dp)) {
                         Icon(
                             if (state.isPlaying) Icons.Filled.Pause else Icons.Filled.PlayArrow,
                             contentDescription = stringResource(if (state.isPlaying) R.string.player_pause else R.string.player_play),
@@ -157,6 +185,13 @@ fun BookScreen(
                     TextButton(onClick = viewModel::cycleSpeed) {
                         Text(stringResource(R.string.player_speed, formatSpeed(state.speed)))
                     }
+                }
+                if (askedForNotifications && !notificationsAllowed) {
+                    Text(
+                        stringResource(R.string.notifications_off_hint),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
                 }
             }
 
@@ -208,6 +243,10 @@ fun BookScreen(
 }
 
 private const val SEEK_MS = 15_000L
+
+private fun notificationsGranted(context: Context): Boolean =
+    Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU ||
+        ContextCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED
 private const val COVER_ASPECT = 1.4f
 
 private fun formatTime(ms: Long): String {

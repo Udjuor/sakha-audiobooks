@@ -1,26 +1,20 @@
 package ru.sakhabooks.app.ui.book
 
-import android.content.Context
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.media3.common.MediaItem
-import androidx.media3.common.Player
-import androidx.media3.exoplayer.ExoPlayer
 import androidx.navigation.toRoute
 import dagger.hilt.android.lifecycle.HiltViewModel
-import dagger.hilt.android.qualifiers.ApplicationContext
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.update
-import kotlinx.coroutines.isActive
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 import ru.sakhabooks.app.data.Book
 import ru.sakhabooks.app.data.CatalogRepository
 import ru.sakhabooks.app.data.Chapter
 import ru.sakhabooks.app.data.ProgressStore
+import ru.sakhabooks.app.player.NowPlaying
+import ru.sakhabooks.app.player.PlayerConnection
 import ru.sakhabooks.app.ui.navigation.BookRoute
 import javax.inject.Inject
 
@@ -31,94 +25,62 @@ data class PlayerUiState(
     val speed: Float = 1f,
 )
 
+/** Экран книги — «пульт» общего плеера: сам звук играет в службе и не прерывается при уходе с экрана. */
 @HiltViewModel
 class BookViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     repository: CatalogRepository,
     private val progress: ProgressStore,
-    @ApplicationContext context: Context,
+    private val player: PlayerConnection,
 ) : ViewModel() {
 
     val book: Book? = repository.book(savedStateHandle.toRoute<BookRoute>().bookId)
     val chapter: Chapter? = book?.chapters?.firstOrNull()
     val coverPath: String? = book?.let(repository::coverPath)
-    private val audioUri: String? = chapter?.let(repository::audioUri)
-    val hasAudio: Boolean = audioUri != null
+    val hasAudio: Boolean = chapter?.let(repository::audioUri) != null
 
-    private val _state = MutableStateFlow(PlayerUiState())
-    val state: StateFlow<PlayerUiState> = _state.asStateFlow()
-
-    private val player: ExoPlayer = ExoPlayer.Builder(context).build()
+    val state: StateFlow<PlayerUiState> = player.state
+        .map(::toUiState)
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), toUiState(player.state.value))
 
     init {
-        if (chapter != null && audioUri != null) {
-            player.setMediaItem(MediaItem.fromUri(audioUri))
-            player.prepare()
-            val saved = progress.position(chapter.id)
-            if (saved > 0) player.seekTo(saved)
-        }
-        player.addListener(object : Player.Listener {
-            override fun onIsPlayingChanged(isPlaying: Boolean) {
-                _state.update { it.copy(isPlaying = isPlaying) }
-                if (!isPlaying) savePosition()
-            }
-
-            override fun onPlaybackStateChanged(playbackState: Int) {
-                if (playbackState == Player.STATE_ENDED) {
-                    // Дослушали до конца — в следующий раз начнём сначала.
-                    chapter?.let { progress.save(it.id, 0L) }
-                }
-                refresh()
-            }
-        })
-        viewModelScope.launch {
-            while (isActive) {
-                refresh()
-                delay(250)
-            }
-        }
+        if (hasAudio) player.connect()
     }
 
-    private fun refresh() {
-        val duration = player.duration.takeIf { it > 0 } ?: 0L
-        _state.update { it.copy(positionMs = player.currentPosition.coerceAtLeast(0L), durationMs = duration) }
+    /** Если играет эта глава — показываем живое состояние плеера, иначе — сохранённое место. */
+    private fun toUiState(now: NowPlaying): PlayerUiState {
+        val ch = chapter ?: return PlayerUiState(speed = now.speed)
+        val fallbackDuration = ch.durationSec * 1000L
+        return if (now.chapterId == ch.id) {
+            PlayerUiState(
+                isPlaying = now.isPlaying,
+                positionMs = now.positionMs,
+                durationMs = now.durationMs.takeIf { it > 0 } ?: fallbackDuration,
+                speed = now.speed,
+            )
+        } else {
+            PlayerUiState(positionMs = progress.position(ch.id), durationMs = fallbackDuration, speed = now.speed)
+        }
     }
 
     fun togglePlay() {
-        if (player.isPlaying) {
-            player.pause()
-        } else {
-            if (player.playbackState == Player.STATE_ENDED) player.seekTo(0)
-            player.play()
-        }
+        val ch = chapter ?: return
+        if (state.value.isPlaying) player.pause() else player.play(ch.id)
     }
 
     fun seekBy(deltaMs: Long) {
-        val target = (player.currentPosition + deltaMs).coerceIn(0L, player.duration.coerceAtLeast(0L))
-        player.seekTo(target)
-        refresh()
+        val ch = chapter ?: return
+        player.seekBy(ch.id, state.value.positionMs, deltaMs)
     }
 
     fun seekTo(positionMs: Long) {
-        player.seekTo(positionMs)
-        refresh()
+        val ch = chapter ?: return
+        player.seekTo(ch.id, positionMs)
     }
 
     fun cycleSpeed() {
-        val next = SPEEDS[(SPEEDS.indexOf(_state.value.speed) + 1) % SPEEDS.size]
-        player.setPlaybackSpeed(next)
-        _state.update { it.copy(speed = next) }
-    }
-
-    private fun savePosition() {
-        val ch = chapter ?: return
-        if (!hasAudio) return
-        if (player.playbackState != Player.STATE_ENDED) progress.save(ch.id, player.currentPosition)
-    }
-
-    override fun onCleared() {
-        savePosition()
-        player.release()
+        val next = SPEEDS[(SPEEDS.indexOf(state.value.speed) + 1) % SPEEDS.size]
+        player.setSpeed(next)
     }
 
     private companion object {
