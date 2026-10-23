@@ -43,6 +43,16 @@
     <!-- Сахалыы саҥар -->
     <string name="speak_title">Сахалыы саҥар</string>
     <string name="speak_placeholder">Скоро здесь появится раздел для тех, кто хочет говорить по-якутски.</string>
+    <string name="speak_intro">Первые шаги в якутском языке: особые буквы, простые фразы и слова из сказок.</string>
+    <string name="speak_demo_note">Демо-материал: проверяется носителем языка, озвучка актёром появится позже.</string>
+    <string name="expand">Развернуть</string>
+    <string name="collapse">Свернуть</string>
+    <plurals name="speak_cards_count">
+        <item quantity="one">%d карточка</item>
+        <item quantity="few">%d карточки</item>
+        <item quantity="many">%d карточек</item>
+        <item quantity="other">%d карточки</item>
+    </plurals>
 
     <!-- Профиль -->
     <string name="profile_title">Профиль</string>
