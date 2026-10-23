@@ -129,12 +129,13 @@ class PlayerConnection @Inject constructor(
         )
     }
 
-    /** Пока играет — обновляем ползунок несколько раз в секунду. */
+    /** Пока играет и открыт экран с плеером — обновляем ползунок несколько раз в секунду. */
     private fun startTicker() {
         if (ticker?.isActive == true) return
         ticker = scope.launch {
             while (isActive) {
-                update()
+                // Экраны не смотрят (свёрнуто, экран выключен) — не тратим батарею
+                if (_state.subscriptionCount.value > 0) update()
                 delay(TICK_MS)
             }
         }

@@ -72,7 +72,7 @@ fun BookScreen(
     val state by viewModel.state.collectAsStateWithLifecycle()
     var textMode by rememberSaveable { mutableStateOf(TextMode.Both) }
 
-    // Android 13+: без разрешения на уведомления звук играет, но кнопок в шторке не будет
+    // Android 13+: один раз спрашиваем разрешение на уведомления при первом «Слушать»
     val context = LocalContext.current
     var notificationsAllowed by remember { mutableStateOf(notificationsGranted(context)) }
     var askedForNotifications by rememberSaveable { mutableStateOf(false) }
@@ -185,13 +185,6 @@ fun BookScreen(
                     TextButton(onClick = viewModel::cycleSpeed) {
                         Text(stringResource(R.string.player_speed, formatSpeed(state.speed)))
                     }
-                }
-                if (askedForNotifications && !notificationsAllowed) {
-                    Text(
-                        stringResource(R.string.notifications_off_hint),
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    )
                 }
             }
 

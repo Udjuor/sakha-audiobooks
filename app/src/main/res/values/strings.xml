@@ -32,9 +32,7 @@
     <string name="text_sah">Саха</string>
     <string name="text_ru">Русский</string>
     <string name="text_both">Оба</string>
-    <string name="player_now_playing">Сейчас играет</string>
     <string name="notification_channel_name">Прослушивание книг</string>
-    <string name="notifications_off_hint">Уведомления выключены: звук играет, но кнопок в шторке и на экране блокировки не будет. Включить: Настройки → Приложения → Саҥарар кинигэ → Уведомления.</string>
     <string name="audio_coming_soon">🎧 Аудиозапись в исполнении актёра скоро появится.</string>
     <string name="translation_coming_soon">Русский перевод готовится. Пока доступен текст на якутском.</string>
 
